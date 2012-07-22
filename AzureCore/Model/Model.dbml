@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="artmapsdev" EntityNamespace="ArtMaps.Persistence.Entities" ContextNamespace="ArtMaps.Persistence.Context" Class="ModelDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Table Name="dbo.Action" Member="Actions">
+    <Type Name="Action">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Association Name="ObjectOfInterest_Action" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="User_Action" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Context" Member="Contexts">
+    <Type Name="Context">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Endpoint" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="[Key]" Member="Key" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Location" Member="Locations">
+    <Type Name="Location">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Source" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Location_LocationNamed" Member="LocationNameds" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationNamed" />
+      <Association Name="Location_LocationEllipse" Member="LocationEllipses" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationEllipse" />
+      <Association Name="Location_LocationPoint" Member="LocationPoints" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationPoint" />
+      <Association Name="Location_LocationPolygon" Member="LocationPolygons" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationPolygon" />
+      <Association Name="ObjectOfInterest_Location" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LocationNamed" Member="LocationNameds">
+    <Type Name="LocationNamed">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="LocationNamed_LocationNamedPart" Member="LocationNamedParts" ThisKey="ID,ContextID" OtherKey="LocationNamedID,ContextID" Type="LocationNamedPart" />
+      <Association Name="Location_LocationNamed" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LocationNamedPart" Member="LocationNamedParts">
+    <Type Name="LocationNamedPart">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Type" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="Part" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="LocationNamedID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="[Order]" Member="Order" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Association Name="LocationNamed_LocationNamedPart" Member="LocationNamed" ThisKey="LocationNamedID,ContextID" OtherKey="ID,ContextID" Type="LocationNamed" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ObjectOfInterest" Member="ObjectOfInterests">
+    <Type Name="ObjectOfInterest">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="ObjectOfInterest_Action" Member="Actions" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="Action" />
+      <Association Name="ObjectOfInterest_Location" Member="Locations" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="Location" />
+    </Type>
+  </Table>
+  <Table Name="dbo.[User]" Member="Users">
+    <Type Name="User">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="User_Action" Member="Actions" ThisKey="ID,ContextID" OtherKey="UserID,ContextID" Type="Action" />
+      <Association Name="User_UserObject" Member="UserObjects" ThisKey="ID,ContextID" OtherKey="UserID,ContextID" Type="UserObject" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserObject" Member="UserObjects">
+    <Type Name="UserObject">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="User_UserObject" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LocationEllipse" Member="LocationEllipses">
+    <Type Name="LocationEllipse">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="MajorAxis" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="MinorAxis" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Angle" Type="System.Double" DbType="Float NOT NULL" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="OriginText" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="Location_LocationEllipse" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LocationPoint" Member="LocationPoints">
+    <Type Name="LocationPoint">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Error" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="CenterText" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="Location_LocationPoint" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LocationPolygon" Member="LocationPolygons">
+    <Type Name="LocationPolygon">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="PointsText" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Association Name="Location_LocationPolygon" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Function Name="dbo.NextID" Method="NextID">
+    <Parameter Name="TableName" Parameter="tableName" Type="System.String" DbType="NVarChar(50)" />
+    <ElementType Name="NextIDResult">
+      <Column Name="CurrentID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.SelectObjectsWithinBounds" Method="SelectObjectsWithinBounds">
+    <Parameter Name="north" Type="System.Double" DbType="Float" />
+    <Parameter Name="south" Type="System.Double" DbType="Float" />
+    <Parameter Name="east" Type="System.Double" DbType="Float" />
+    <Parameter Name="west" Type="System.Double" DbType="Float" />
+    <Parameter Name="contextID" Type="System.Int64" DbType="BigInt" />
+    <ElementType Name="SelectObjectsWithinBoundsResult">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Locations" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Actions" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+</Database>

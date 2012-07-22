@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceDefinition name="AzureCore" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2012-05.1.7">
+  <WebRole name="UI" vmsize="Small">
+    <Sites>
+      <Site name="Web">
+        <Bindings>
+          <Binding name="http" endpointName="http" />
+        </Bindings>
+      </Site>
+    </Sites>
+    <Endpoints>
+      <InputEndpoint name="http" protocol="http" port="80" />
+    </Endpoints>
+    <Imports>
+      <Import moduleName="Diagnostics" />
+    </Imports>
+    <ConfigurationSettings>
+      <Setting name="ArtMaps.DevFabric.Tracing.Path" />
+      <Setting name="ArtMaps.Diagnostics.BufferQuota" />
+      <Setting name="ArtMaps.Diagnostics.LogLevel" />
+      <Setting name="ArtMaps.Diagnostics.TransferPeriod" />
+      <Setting name="ArtMaps.Security.KeySize" />
+      <Setting name="ArtMaps.SqlServer.ConnectionString" />
+      <Setting name="ArtMaps.Storage.ConnectionString" />
+      <Setting name="ArtMaps.Storage.Containers" />
+      <Setting name="ArtMaps.Storage.Queues" />
+      <Setting name="ArtMaps.Storage.Tables" />
+    </ConfigurationSettings>
+    <Certificates>
+    </Certificates>
+  </WebRole>
+</ServiceDefinition>
