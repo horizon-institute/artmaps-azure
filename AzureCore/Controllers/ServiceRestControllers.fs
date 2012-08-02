@@ -3,6 +3,7 @@
 namespace ArtMaps.Controllers
 
 open ArtMaps.Persistence.Entities
+open Microsoft.ApplicationServer.Caching
 open Microsoft.SqlServer.Types
 open System.Data.Linq
 open System.Linq
@@ -25,13 +26,26 @@ type ObjectsOfInterestController() =
     member this.Search
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 [<FromUri>]qp : Types.QueryParameters) =
+
+        let cname = sprintf "%s_%i_%i_%i_%i" 
+                        context.name
+                        qp.boundingBox.northEast.latitude
+                        qp.boundingBox.northEast.longitude
+                        qp.boundingBox.southWest.latitude
+                        qp.boundingBox.southWest.longitude
+
         let n = fun i -> new System.Nullable<float>(Conv.ToFloatCoord i)
         context.dataContext.SelectObjectsWithinBounds(
-            n qp.boundingBox.northEast.latitude,
-            n qp.boundingBox.southWest.latitude,
-            n qp.boundingBox.northEast.longitude,
-            n qp.boundingBox.southWest.longitude,
-            new System.Nullable<int64>(context.ID)) |> Seq.map Conv.InBoundsResultToObjectRecord
+                n qp.boundingBox.northEast.latitude,
+                n qp.boundingBox.southWest.latitude,
+                n qp.boundingBox.northEast.longitude,
+                n qp.boundingBox.southWest.longitude,
+                new System.Nullable<int64>(context.ID)) |> Seq.map Conv.InBoundsResultToObjectRecord
+
+    [<HttpOptions>]
+    [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
+    member this.Options() = ()
 
     [<HttpGet>]
     [<ActionName("Default")>]
@@ -69,11 +83,11 @@ type ObjectsOfInterestController() =
             | _ ->
                 raise (E.Forbidden(E.ForbiddenMinorCode.InvalidSignature))
               
-        if (System.DateTime.UtcNow + System.TimeSpan.FromMinutes(float 5)) > Conv.ToDateTime interest.timestamp then
+        if System.DateTime.UtcNow > ((Conv.ToDateTime interest.timestamp) + System.TimeSpan.FromMinutes(float 5)) then
             raise (E.Forbidden(E.ForbiddenMinorCode.Expired))
 
         let o = new ObjectOfInterest()
-        o.ID <- context.dataContext.GetNextID(o)
+        o.ID <- context.getNextID(o :> obj)
         o.URI <- interest.URI
         context.dataContext.ObjectOfInterests.InsertOnSubmit(o)
         context.dataContext.SubmitChanges()
@@ -83,6 +97,11 @@ type ObjectsOfInterestController() =
 [<WU.ValidContextFilter()>]
 type ActionsController() =
     inherit ApiController()
+
+    [<HttpOptions>]
+    [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
+    member this.Options() = ()
 
     [<HttpGet>]
     [<ActionName("Default")>]
@@ -96,6 +115,7 @@ type ActionsController() =
 
     [<HttpGet>]
     [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 oID : int64,
@@ -129,21 +149,21 @@ type ActionsController() =
             | _ ->
                 raise (E.Forbidden(E.ForbiddenMinorCode.InvalidSignature))
               
-        if (System.DateTime.UtcNow + System.TimeSpan.FromMinutes(float 5)) > Conv.ToDateTime action.timestamp then
+        if System.DateTime.UtcNow > ((Conv.ToDateTime action.timestamp) + System.TimeSpan.FromMinutes(float 5)) then
             raise (E.Forbidden(E.ForbiddenMinorCode.Expired))
 
         let userURI = sprintf "%s://%s" context.name action.username
         let u = match context.dataContext.Users.SingleOrDefault(fun (u : User) -> u.URI = userURI) with
                     | null -> 
                         let u = new User()
-                        u.ID <- context.dataContext.GetNextID(u)
+                        u.ID <- context.getNextID(u :> obj)
                         u.URI <- userURI
                         context.dataContext.Users.InsertOnSubmit(u)
                         context.dataContext.SubmitChanges()
                         u
                     | _ as u -> u
         let a = new Action()
-        a.ID <- context.dataContext.GetNextID(a)
+        a.ID <- context.getNextID(a :> obj)
         a.ObjectOfInterest <- o
         a.User <- u
         a.URI <- action.URI
@@ -157,6 +177,11 @@ type ActionsController() =
 type LocationsController() =
     inherit ApiController()
 
+    [<HttpOptions>]
+    [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
+    member this.Options() = ()
+
     [<HttpGet>]
     [<ActionName("Default")>]
     member this.GetAll
@@ -169,6 +194,7 @@ type LocationsController() =
 
     [<HttpGet>]
     [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 oID : int64,
@@ -204,18 +230,20 @@ type LocationsController() =
                 raise (E.Forbidden(E.ForbiddenMinorCode.InvalidSignature))
         with 
             | :? HttpResponseException as e ->
+                Log.Warning "Signature Verification Warning: Invalid signature"
                 raise e
-            | _ ->
+            | _ as e ->
+                sprintf "Signature Verification Failed: %s\n%s" e.Message e.StackTrace |> Log.Warning
                 raise (E.Forbidden(E.ForbiddenMinorCode.InvalidSignature))
 
-        if (System.DateTime.UtcNow + System.TimeSpan.FromMinutes(float 5)) > Conv.ToDateTime location.timestamp then
+        if System.DateTime.UtcNow > ((Conv.ToDateTime location.timestamp) + System.TimeSpan.FromMinutes(float 5)) then
             raise (E.Forbidden(E.ForbiddenMinorCode.Expired))
 
         let userURI = sprintf "%s://%s" context.name location.username
         let u = match context.dataContext.Users.SingleOrDefault(fun (u : User) -> u.URI = userURI) with
                     | null -> 
                         let u = new User()
-                        u.ID <- context.dataContext.GetNextID(u)
+                        u.ID <- context.getNextID(u :> obj)
                         u.URI <- userURI
                         context.dataContext.Users.InsertOnSubmit(u)
                         context.dataContext.SubmitChanges()
@@ -223,12 +251,12 @@ type LocationsController() =
                     | _ as u -> u
         
         let p = new LocationPoint()
-        p.ID <- context.dataContext.GetNextID("LocationPoint")
+        p.ID <- context.getNextID(p :> obj)
         p.Error <- location.error
         p.Center <- SqlGeography.Point(Conv.ToFloatCoord location.latitude, Conv.ToFloatCoord location.longitude, Conv.SRID)
         context.dataContext.LocationPoints.InsertOnSubmit(p)
         let l = new Location()
-        l.ID <- context.dataContext.GetNextID(l)
+        l.ID <- context.getNextID(l :> obj)
         l.LocationSource <- LocationSource.User
         l.ObjectOfInterest <- o
         l.LocationPoints.Add(p)
@@ -241,13 +269,29 @@ type LocationsController() =
 type MetadataController() =
     inherit ApiController()
 
+    static let cache = new DataCache("metadata")
+
+    [<HttpOptions>]
+    [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
+    member this.Options() = ()
+
     [<HttpGet>]
     [<ActionName("Default")>]
+    [<WU.CacheHeaderFilter(31536000L)>] // Expiry time set to a year
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 oID : int64) =
-        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.ID = oID))
-        if o = null then 
-            raise (E.NotFound(E.NotFoundMinorCode.Unspecified))
-        let filters = ArtMaps.Controllers.Metadata.GetFilters(o.URI)
-        filters.[0](o.URI)
+        
+        let cname = sprintf "%s_%i" context.name oID
+        let m = cache.Get(cname)
+        match m with
+            | null ->
+                let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.ID = oID))
+                if o = null then 
+                    raise (E.NotFound(E.NotFoundMinorCode.Unspecified))
+                let filters = ArtMaps.Controllers.Metadata.GetFilters(o.URI)
+                let m = filters.[0](o.URI)
+                cache.Add(cname, m) |> ignore
+                m :> obj
+            | _ -> m

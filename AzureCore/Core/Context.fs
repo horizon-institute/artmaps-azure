@@ -13,6 +13,7 @@ type t = {
     name : string
     dataContext : ModelDataContext
     verifySignature : byte[] -> obj -> bool
+    getNextID : obj -> int64
 }
 
 let verify (key : byte[]) (data : byte[]) (signature : obj) = 
@@ -35,6 +36,7 @@ let CreateAdminContext (key : byte[]) (ctx : ModelDataContext) =
         t.name = null
         dataContext = ctx
         verifySignature = verify key
+        getNextID = (fun o -> ctx.GetNextID(o))
     }
 
 let CreateServiceContext (name : string) (ctx : ModelDataContext) = 
@@ -49,4 +51,12 @@ let CreateServiceContext (name : string) (ctx : ModelDataContext) =
                     name = name
                     dataContext = ctx
                     verifySignature = verify (c.Key.ToArray())
+                    getNextID = 
+                        (fun o -> 
+                            ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
+                            try
+                                ctx.GetNextID(o)
+                            finally
+                                ctx.ExecuteCommand(sprintf "USE FEDERATION ContextFederation(ContextID=%i) WITH RESET, FILTERING=ON" c.ID, [||]) |> ignore
+                        )
             })

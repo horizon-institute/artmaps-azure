@@ -25,21 +25,27 @@ namespace ArtMaps.UI
             var ss = GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings;
             if (ss == null)
                 ss = new Newtonsoft.Json.JsonSerializerSettings();
+            ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.ActionConverter());
+            ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.PointLocationConverter());
+            ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.ObjectOfInterestConverter());
             ss.Converters.Add(new ArtMaps.Utilities.Web.RecordConverter());
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = ss;
 
             if (RoleEnvironment.IsEmulated)
             {
+                var logname = "UI.Global." + RoleEnvironment.CurrentRoleInstance.Id + ".log";
                 var path = System.IO.Path.Combine(
                     ArtMaps.Azure.Utilities.Configuration.Value<string>("ArtMaps.DevFabric.Tracing.Path"),
-                    "UI.Global.log");
+                    logname);
                 System.Diagnostics.Trace.Listeners.Add(
                     new ArtMaps.Azure.Utilities.Configuration.DevFabricTraceListener(
                         path,
-                        "UI.Global.log"));
+                        logname));
             }
 
-            GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.LocalOnly;
+            //GlobalConfiguration.Configuration.MessageHandlers.Add(new ArtMaps.Utilities.Web.ContextClosingHandler());
+            GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Never;
+            GlobalConfiguration.Configuration.Filters.Add(new ArtMaps.Utilities.Web.ExceptionLoggingFilter());
         }
     }
 }

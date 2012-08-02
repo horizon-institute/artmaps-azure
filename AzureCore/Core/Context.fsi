@@ -9,6 +9,7 @@ type t = {
     name : string
     dataContext : ModelDataContext
     verifySignature : byte[] -> obj -> bool
+    getNextID : obj -> int64
 }
     
 val CreateAdminContext : byte[] -> ModelDataContext -> t

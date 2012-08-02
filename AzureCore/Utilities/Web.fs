@@ -8,7 +8,9 @@ open Newtonsoft.Json
 open System
 open System.Collections.Generic
 open System.Linq
+open System.Net.Http.Headers
 open System.Text
+open System.Threading.Tasks
 open System.Web.Http.Controllers
 open System.Web.Http.Filters
 open System.Web.Http.ModelBinding
@@ -138,6 +140,7 @@ type ContextBinder() =
                 match CTX.CreateServiceContext name ctx with
                     | Some(c) -> c :> obj
                     | None -> null
+        actionContext.Request.Properties.Add("context", bindingContext.Model)
         true
 
 
@@ -176,3 +179,33 @@ type EncodingBinderProvider() =
         match bindingContext.ModelType.IsAssignableFrom(typeof<Encoding>) with
             | true -> new EncodingBinder() :> IModelBinder
             | false -> null
+
+type ExceptionLoggingFilter() =
+    inherit ExceptionFilterAttribute()
+    override this.OnException(context) =
+        let e = context.Exception
+        sprintf "%s\n%s" e.Message e.StackTrace |> Log.Error
+
+type CacheHeaderFilter(seconds : int64) =
+    inherit ActionFilterAttribute()
+    override this.OnActionExecuted(ctx) =
+        let h = new CacheControlHeaderValue()
+        h.MaxAge <- new Nullable<TimeSpan>(TimeSpan.FromSeconds(float seconds))
+        ctx.Response.Headers.CacheControl <- h
+
+type ContextClosingHandler() =
+    inherit Net.Http.DelegatingHandler()
+    override this.SendAsync(request, cancellationToken) =
+        let r = base.SendAsync(request, cancellationToken)
+        match request.Properties.ContainsKey("context") with
+            | false -> r
+            | _ ->
+                let dc = request.Properties.["context"] :?> CTX.t
+                let close (t : Task<Net.Http.HttpResponseMessage>) =
+                    let result = t.Result
+                    try
+                        dc.dataContext.Dispose()
+                    with _ as e -> 
+                        sprintf "%s\n%s" e.Message e.StackTrace |> Log.Error
+                    result
+                r.ContinueWith<Net.Http.HttpResponseMessage>(new Func<_,_>(close))

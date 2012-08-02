@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="AzureCore" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2012-05.1.7">
-  <WebRole name="UI" vmsize="Small">
+  <WebRole name="UI" vmsize="Medium">
     <Sites>
       <Site name="Web">
         <Bindings>
@@ -13,6 +13,7 @@
     </Endpoints>
     <Imports>
       <Import moduleName="Diagnostics" />
+      <Import moduleName="Caching" />
     </Imports>
     <ConfigurationSettings>
       <Setting name="ArtMaps.DevFabric.Tracing.Path" />
@@ -28,5 +29,9 @@
     </ConfigurationSettings>
     <Certificates>
     </Certificates>
+    <LocalResources>
+      <LocalStorage name="Microsoft.WindowsAzure.Plugins.Caching.FileStore" sizeInMB="1000" cleanOnRoleRecycle="false" />
+      <LocalStorage name="DiagnosticStore" cleanOnRoleRecycle="false" sizeInMB="8192" />
+    </LocalResources>
   </WebRole>
 </ServiceDefinition>

@@ -36,6 +36,10 @@ type AdminController() =
 
     let AllowedContextNameRegex = new RegularExpressions.Regex("^[a-z0-9]*$");
     
+    [<HttpOptions>]
+    [<ActionName("Context")>]
+    member this.Options() = ()
+
     [<HttpPost>]
     [<ActionName("Context")>] 
     member this.CreateContext

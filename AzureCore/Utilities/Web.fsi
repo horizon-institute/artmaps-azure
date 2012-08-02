@@ -37,3 +37,15 @@ type EncodingBinder =
 type EncodingBinderProvider =
     inherit System.Web.Http.ModelBinding.ModelBinderProvider
     new : unit -> EncodingBinderProvider
+
+type ExceptionLoggingFilter =
+    inherit System.Web.Http.Filters.ExceptionFilterAttribute
+    new : unit -> ExceptionLoggingFilter
+
+type CacheHeaderFilter =
+    inherit System.Web.Http.Filters.ActionFilterAttribute
+    new : int64 -> CacheHeaderFilter
+
+type ContextClosingHandler =
+    inherit System.Net.Http.DelegatingHandler
+    new : unit -> ContextClosingHandler

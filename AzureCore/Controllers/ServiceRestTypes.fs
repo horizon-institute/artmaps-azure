@@ -57,6 +57,108 @@ type ObjectOfInterest = {
     signature : string
 }
 
+    
+    module JsonConverters =
+    
+        type ActionConverter() =
+            inherit Newtonsoft.Json.JsonConverter()
+    
+            override this.CanRead with get () = false
+            override this.CanWrite with get () = true
+            override this.CanConvert(t) = t = typeof<Action>
+
+            override this.ReadJson(reader, t, ob, serializer) =
+                raise (new System.NotImplementedException())
+
+            override this.WriteJson(writer, ob, serializer) = 
+
+                let a = ob :?> Action
+                writer.WriteStartObject()
+                
+                writer.WritePropertyName("ID")
+                writer.WriteValue(a.ID)
+
+                writer.WritePropertyName("URI")
+                writer.WriteValue(a.URI)
+
+                writer.WritePropertyName("userID")
+                writer.WriteValue(a.userID)
+
+                writer.WritePropertyName("datetime")
+                writer.WriteValue(a.datetime)
+                                
+                writer.WriteEndObject()
+
+        type PointLocationConverter() =
+            inherit Newtonsoft.Json.JsonConverter()
+    
+            override this.CanRead with get () = false
+            override this.CanWrite with get () = true
+            override this.CanConvert(t) = t = typeof<PointLocation>
+
+            override this.ReadJson(reader, t, ob, serializer) =
+                raise (new System.NotImplementedException())
+
+            override this.WriteJson(writer, ob, serializer) = 
+
+                let p = ob :?> PointLocation
+                writer.WriteStartObject()
+                
+                writer.WritePropertyName("ID")
+                writer.WriteValue(p.ID)
+
+                writer.WritePropertyName("source")
+                writer.WriteValue(p.source)
+
+                writer.WritePropertyName("latitude")
+                writer.WriteValue(p.latitude)
+
+                writer.WritePropertyName("longitude")
+                writer.WriteValue(p.longitude)
+
+                writer.WritePropertyName("error")
+                writer.WriteValue(p.error)
+                                
+                writer.WriteEndObject()
+
+
+        type ObjectOfInterestConverter() =
+            inherit Newtonsoft.Json.JsonConverter()
+
+            static let acConv = new ActionConverter()
+            static let plConv = new PointLocationConverter()
+    
+            override this.CanRead with get () = false
+            override this.CanWrite with get () = true
+            override this.CanConvert(t) = t = typeof<ObjectOfInterest>
+
+            override this.ReadJson(reader, t, ob, serializer) =
+                raise (new System.NotImplementedException())
+
+            override this.WriteJson(writer, ob, serializer) = 
+
+                let o = ob :?> ObjectOfInterest
+                writer.WriteStartObject()
+                
+                writer.WritePropertyName("ID")
+                writer.WriteValue(o.ID)
+
+                writer.WritePropertyName("URI")
+                writer.WriteValue(o.URI)
+
+                writer.WritePropertyName("locations")
+                writer.WriteStartArray()
+                o.locations |> Seq.iter (fun l -> plConv.WriteJson(writer, l, serializer))
+                writer.WriteEndArray()
+
+                writer.WritePropertyName("actions")
+                writer.WriteStartArray()
+                o.actions |> Seq.iter (fun a -> acConv.WriteJson(writer, a, serializer))
+                writer.WriteEndArray()
+                
+                writer.WriteEndObject()
+                
+
     module Conversions =
 
         open ArtMaps.Persistence

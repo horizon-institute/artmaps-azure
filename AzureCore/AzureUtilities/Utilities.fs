@@ -4,11 +4,11 @@ module ArtMaps.Azure.Utilities
 
 module Configuration = 
     
+    open Microsoft.ApplicationServer.Caching.AzureCommon
     open Microsoft.WindowsAzure
     open Microsoft.WindowsAzure.Diagnostics
     open Microsoft.WindowsAzure.ServiceRuntime
     open Microsoft.WindowsAzure.StorageClient
-
     open System
     open System.Collections.Generic
     open System.IO
@@ -28,7 +28,10 @@ module Configuration =
             this.Write(s)
             this.Write(Environment.NewLine)
         override this.Finalize() =
-            files.[file].Close()
+            try
+                if files.ContainsKey(file) then
+                    files.[file].Close()
+            with _ -> ()
 
     let inline Value<'T> name : 'T =
         let v = RoleEnvironment.GetConfigurationSettingValue(name)
@@ -49,11 +52,15 @@ module Configuration =
                 )
 
     let Diagnostics () =
-        let diaConf = DiagnosticMonitor.GetDefaultInitialConfiguration()
+        
+        let diaConf = CacheDiagnostics.ConfigureDiagnostics(
+                            DiagnosticMonitor.GetDefaultInitialConfiguration())
     
         let logLevel = Enum.Parse(typeof<LogLevel>, Value("ArtMaps.Diagnostics.LogLevel"), true) :?> LogLevel
         let transferPeriod = TimeSpan.FromMinutes(Value("ArtMaps.Diagnostics.TransferPeriod"))
         let bufferQuota = Value("ArtMaps.Diagnostics.BufferQuota")
+
+        diaConf.OverallQuotaInMB <- 8192
 
         diaConf.Logs.ScheduledTransferPeriod <- transferPeriod
         diaConf.Logs.BufferQuotaInMB <- bufferQuota
@@ -61,7 +68,7 @@ module Configuration =
 
         diaConf.Directories.ScheduledTransferPeriod <- transferPeriod
         diaConf.Directories.BufferQuotaInMB <- bufferQuota
-
+        
         diaConf.DiagnosticInfrastructureLogs.ScheduledTransferPeriod <- transferPeriod
         diaConf.DiagnosticInfrastructureLogs.BufferQuotaInMB <- bufferQuota
         diaConf.DiagnosticInfrastructureLogs.ScheduledTransferLogLevelFilter <- logLevel
