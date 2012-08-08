@@ -20,8 +20,6 @@
 		052C981C15C42B78002C519C /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 052C981B15C42B78002C519C /* NSString+HTML.m */; };
 		052C981F15C42BFC002C519C /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 052C981E15C42BFC002C519C /* GTMNSString+HTML.m */; };
 		0563F11315B075B400E604A2 /* POICircleOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = 0563F11215B075B400E604A2 /* POICircleOverlay.m */; };
-		057AE94C15C97AE20029DD04 /* banana.png in Resources */ = {isa = PBXBuildFile; fileRef = 057AE94A15C97AE20029DD04 /* banana.png */; };
-		057AE94D15C97AE20029DD04 /* banana@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 057AE94B15C97AE20029DD04 /* banana@2x.png */; };
 		057D208C15CD60BB00633072 /* MetaListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 057D208A15CD60BB00633072 /* MetaListTableViewController.m */; };
 		057D208D15CD60BB00633072 /* MetaListTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 057D208B15CD60BB00633072 /* MetaListTableViewController.xib */; };
 		0580DC8E15CAC915007F4A06 /* REVAnnotationsCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 0580DC8415CAC915007F4A06 /* REVAnnotationsCollection.m */; };
@@ -686,8 +684,6 @@
 		052C981E15C42BFC002C519C /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		0563F11115B075B400E604A2 /* POICircleOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = POICircleOverlay.h; sourceTree = "<group>"; };
 		0563F11215B075B400E604A2 /* POICircleOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = POICircleOverlay.m; sourceTree = "<group>"; };
-		057AE94A15C97AE20029DD04 /* banana.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = banana.png; sourceTree = "<group>"; };
-		057AE94B15C97AE20029DD04 /* banana@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banana@2x.png"; sourceTree = "<group>"; };
 		057D208915CD60BB00633072 /* MetaListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MetaListTableViewController.h; sourceTree = "<group>"; };
 		057D208A15CD60BB00633072 /* MetaListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MetaListTableViewController.m; sourceTree = "<group>"; };
 		057D208B15CD60BB00633072 /* MetaListTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MetaListTableViewController.xib; sourceTree = "<group>"; };
@@ -1640,8 +1636,6 @@
 			children = (
 				0580DC9615CADE40007F4A06 /* cluster.png */,
 				0580DC9715CADE41007F4A06 /* cluster@2x.png */,
-				057AE94A15C97AE20029DD04 /* banana.png */,
-				057AE94B15C97AE20029DD04 /* banana@2x.png */,
 			);
 			name = annotation;
 			sourceTree = "<group>";
@@ -3607,8 +3601,6 @@
 				05863F5F15AD99520047B19C /* map.png in Resources */,
 				05825EE215B55F7200614D64 /* HIOoIViewController.xib in Resources */,
 				0596D2E215C17B0100A0BAA0 /* MetaTableViewController.xib in Resources */,
-				057AE94C15C97AE20029DD04 /* banana.png in Resources */,
-				057AE94D15C97AE20029DD04 /* banana@2x.png in Resources */,
 				0580DC9815CADE42007F4A06 /* cluster.png in Resources */,
 				0580DC9915CADE42007F4A06 /* cluster@2x.png in Resources */,
 				057D208D15CD60BB00633072 /* MetaListTableViewController.xib in Resources */,
