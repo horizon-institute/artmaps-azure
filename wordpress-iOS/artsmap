@@ -1,0 +1,5 @@
+[
+    { "id": 1, "latitude": 52.9875, "longitude": -1.17556, "name": "vermon park", "description": "This is my test" },
+    { "id": 2, "latitude": 52.991437, "longitude": -1.155310, "name": "NHS City Hospital", "description": "This is my test" },
+    { "id": 3, "latitude": 52.952672, "longitude": -1.184986, "name": "Jubilee Campus", "description": "This is my test" }
+]
