@@ -188,24 +188,12 @@ type ExceptionLoggingFilter() =
 
 type CacheHeaderFilter(seconds : int64) =
     inherit ActionFilterAttribute()
+    new(days : int, hours : int, minutes : int, seconds : int) = 
+        new CacheHeaderFilter(((((((int64 days) * 24L) + (int64 hours)) * 60L) + (int64 minutes)) * 60L) + (int64 seconds))
     override this.OnActionExecuted(ctx) =
-        let h = new CacheControlHeaderValue()
-        h.MaxAge <- new Nullable<TimeSpan>(TimeSpan.FromSeconds(float seconds))
-        ctx.Response.Headers.CacheControl <- h
-
-type ContextClosingHandler() =
-    inherit Net.Http.DelegatingHandler()
-    override this.SendAsync(request, cancellationToken) =
-        let r = base.SendAsync(request, cancellationToken)
-        match request.Properties.ContainsKey("context") with
-            | false -> r
-            | _ ->
-                let dc = request.Properties.["context"] :?> CTX.t
-                let close (t : Task<Net.Http.HttpResponseMessage>) =
-                    let result = t.Result
-                    try
-                        dc.dataContext.Dispose()
-                    with _ as e -> 
-                        sprintf "%s\n%s" e.Message e.StackTrace |> Log.Error
-                    result
-                r.ContinueWith<Net.Http.HttpResponseMessage>(new Func<_,_>(close))
+        try
+            let h = new CacheControlHeaderValue()
+            h.MaxAge <- new Nullable<TimeSpan>(TimeSpan.FromSeconds(float seconds))
+            ctx.Response.Headers.CacheControl <- h
+        with _ as e ->
+            sprintf "Unable to set cache response header: %s\n%s" e.Message e.StackTrace |> Log.Warning

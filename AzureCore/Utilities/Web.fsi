@@ -44,8 +44,7 @@ type ExceptionLoggingFilter =
 
 type CacheHeaderFilter =
     inherit System.Web.Http.Filters.ActionFilterAttribute
-    new : int64 -> CacheHeaderFilter
+    new : int64 -> CacheHeaderFilter    
+    new : int * int * int * int -> CacheHeaderFilter
 
-type ContextClosingHandler =
-    inherit System.Net.Http.DelegatingHandler
-    new : unit -> ContextClosingHandler
+

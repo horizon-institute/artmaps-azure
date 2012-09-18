@@ -1,0 +1,30 @@
+/*
+Theme Name:     ArtMaps
+Theme URI:      http://www.horizon.ac.uk
+Description:    ArtMaps Theme
+Author:         Horizon
+Author URI:     http://www.horizon.ac.uk
+Template:       twentyeleven
+Version:        0.1.0
+*/
+@import url("../twentyeleven/style.css");
+
+#ArtMaps_ArtworkTemplate_ArtworkContainer {
+    width: 500px; 
+    display: table-cell;
+    vertical-align: top;
+}
+
+#ArtMaps_ArtworkTemplate_MapContainer {
+    width: 500px; 
+    display: table-cell;
+}
+
+#ArtMaps_ArtworkTemplate_ArtworkImage {
+    max-width: 500px;
+}
+
+#ArtMaps_ArtworkTemplate_MapFrame {
+    width: 100%;
+    height: 400px;
+}

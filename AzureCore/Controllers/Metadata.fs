@@ -18,13 +18,13 @@ module Filters =
         override this.Equals(other) = this.GetHashCode() = other.GetHashCode()
         override this.GetHashCode() = base.GetHashCode()
         interface IComparable<FilterUriMatch> with
-            member this.CompareTo(other) = this.GetHashCode().CompareTo(other.GetHashCode)
+            member this.CompareTo(other) = this.GetHashCode().CompareTo(other.GetHashCode())
         interface IComparable with
-            member this.CompareTo(other) = this.GetHashCode().CompareTo(other.GetHashCode)
+            member this.CompareTo(other) = this.GetHashCode().CompareTo(other.GetHashCode())
 
     [<FilterUriMatch("^tatecollection://.*$")>]
     let TateCollectionFilter (uri : string) =
-        let USER_AGENT = @"ArtMapsCore/TateCollectionFilter/V1"
+        let USER_AGENT = @"ArtMapsCore/1.0"
         let BASE_URL = "http://www.tate.org.uk"
         let ARTWORK_URL = sprintf "%s/art/artworks/%s" BASE_URL
         let IMAGE_URL = sprintf "%s%s" BASE_URL
