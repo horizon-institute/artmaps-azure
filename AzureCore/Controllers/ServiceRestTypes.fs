@@ -19,8 +19,13 @@ type BoundingBox = {
 }
 
 [<ModelBinder(typeof<WU.RecordBinderProvider>)>]
-type QueryParameters = {
-    boundingBox : BoundingBox;    
+type OoIQueryParameters = {
+    boundingBox : BoundingBox
+}
+
+[<ModelBinder(typeof<WU.RecordBinderProvider>)>]
+type UserQueryParameters = {
+    URI : string
 }
 
 type Action = {
@@ -55,6 +60,11 @@ type ObjectOfInterest = {
     userLevel : string
     timestamp : int64
     signature : string
+}
+
+type User = {
+    ID : int64
+    URI : string
 }
 
     
@@ -156,6 +166,29 @@ type ObjectOfInterest = {
                 o.actions |> Seq.iter (fun a -> acConv.WriteJson(writer, a, serializer))
                 writer.WriteEndArray()
                 
+                writer.WriteEndObject()
+
+        type UserConverter() =
+            inherit Newtonsoft.Json.JsonConverter()
+    
+            override this.CanRead with get () = false
+            override this.CanWrite with get () = true
+            override this.CanConvert(t) = t = typeof<User>
+
+            override this.ReadJson(reader, t, ob, serializer) =
+                raise (new System.NotImplementedException())
+
+            override this.WriteJson(writer, ob, serializer) = 
+
+                let a = ob :?> User
+                writer.WriteStartObject()
+                
+                writer.WritePropertyName("ID")
+                writer.WriteValue(a.ID)
+
+                writer.WritePropertyName("URI")
+                writer.WriteValue(a.URI)
+                                
                 writer.WriteEndObject()
                 
 
@@ -277,4 +310,10 @@ type ObjectOfInterest = {
                 userLevel = null
                 timestamp = 0L
                 signature = null
+            }
+
+        let UserToUserRecord (u : Entities.User) =
+            {
+                User.ID = u.ID
+                URI = u.URI
             }

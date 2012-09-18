@@ -28,6 +28,7 @@ namespace ArtMaps.UI
             ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.ActionConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.PointLocationConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.ObjectOfInterestConverter());
+            ss.Converters.Add(new ArtMaps.Controllers.Types.JsonConverters.UserConverter());
             ss.Converters.Add(new ArtMaps.Utilities.Web.RecordConverter());
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = ss;
 
@@ -43,9 +44,9 @@ namespace ArtMaps.UI
                         logname));
             }
 
-            //GlobalConfiguration.Configuration.MessageHandlers.Add(new ArtMaps.Utilities.Web.ContextClosingHandler());
-            GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Never;
+            GlobalConfiguration.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             GlobalConfiguration.Configuration.Filters.Add(new ArtMaps.Utilities.Web.ExceptionLoggingFilter());
+            System.Threading.ThreadPool.SetMinThreads(20, 20);
         }
     }
 }

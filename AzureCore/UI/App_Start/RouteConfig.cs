@@ -22,8 +22,22 @@ namespace ArtMaps.UI
                 routeTemplate: "admin/rest/v1/{action}",
                 defaults: new { controller = "Admin" }
             ));
-            
-            
+
+            rts.Add(routes.MapHttpRoute(
+                name: "ExternalSearch",
+                routeTemplate: "service/{context}/rest/v1/external/search",
+                defaults: new { controller = "External", action = "Search" }
+            ));
+            rts.Add(routes.MapHttpRoute(
+                name: "UsersSearch",
+                routeTemplate: "service/{context}/rest/v1/users/search",
+                defaults: new { controller = "Users", action = "Search" }
+            ));
+            rts.Add(routes.MapHttpRoute(
+                name: "UsersDefault",
+                routeTemplate: "service/{context}/rest/v1/users/{ID}",
+                defaults: new { controller = "Users", action = "Default", ID = RouteParameter.Optional }
+            ));
             rts.Add(routes.MapHttpRoute(
                 name: "ActionsDefault",
                 routeTemplate: "service/{context}/rest/v1/objectsofinterest/{oID}/actions/{ID}",

@@ -4,6 +4,7 @@ module ArtMaps.Azure.Utilities
 
 module Configuration = 
     
+    open Microsoft.ApplicationServer.Caching
     open Microsoft.ApplicationServer.Caching.AzureCommon
     open Microsoft.WindowsAzure
     open Microsoft.WindowsAzure.Diagnostics
