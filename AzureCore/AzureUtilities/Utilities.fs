@@ -2,6 +2,15 @@
 
 module ArtMaps.Azure.Utilities
 
+module Cache =
+
+    open Microsoft.ApplicationServer.Caching
+    open Microsoft.ApplicationServer.Caching.AzureCommon
+
+    let clearMetadata () =
+        let cache = new DataCache("metadata")
+        cache.Clear()
+
 module Configuration = 
     
     open Microsoft.ApplicationServer.Caching

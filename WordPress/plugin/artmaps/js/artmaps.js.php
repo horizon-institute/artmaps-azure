@@ -32,7 +32,7 @@ function userHasRole($r) {
     return $UserRole >= $r;
 }
 
-foreach(array("base", "util", "ui", "map") as $f)
+foreach(array("base", "util", "ui", "map", "search") as $f)
     require_once("artmaps_$f.js.php");
 ?>
 

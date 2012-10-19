@@ -13,6 +13,33 @@ ArtMaps.Util.RunOnce = function() {
     };
 };
 
+ArtMaps.Util.browserLocation = function(success, failure) {
+    var fallback = function() {
+        if(google.loader.ClientLocation) {
+            success(new google.maps.LatLng(google.loader.ClientLocation.latitude, google.loader.ClientLocation.longitude));
+        } else {
+            jQuery.ajax({
+                "type": "GET",
+                "url": "http://api.ipinfodb.com/v3/ip-city/?key=1b8dea30557cab4a1926ab73ced2eff730a3ca975d193c25ea9907be8a432326&format=json",
+                "async": false,
+                "dataType": "jsonp",
+                "success": function(data) {
+                    success(new google.maps.LatLng(data.latitude, data.longitude));
+                },
+                "error": function() { failure(); }
+            });
+        }
+    }
+    if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    success(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+                },
+                function(err) { fallback(); }
+        );
+    } else { fallback(); }
+}
+
 ArtMaps.Util.toIntCoord = function(f) {
     return parseInt(f * Math.pow(10, 8));
 };

@@ -164,9 +164,16 @@ $ArtMapsUpdateProfile =
         $cfg = getUsersArtMapsBlog($current_user);
         if($_POST["ArtMaps_Use_Personal_Blog"]) {
             $cfg["IsInternal"] = false;
-            $cfg["ExternalURL"] = $_POST["ArtMaps_Use_Personal_Blog_URL"];
-            $cfg["ExternalUsername"] = $_POST["ArtMaps_Use_Personal_Blog_Username"];
-            $pw = $_POST["ArtMaps_Use_Personal_Blog_Password"];
+
+            $burl = trim($_POST["ArtMaps_Use_Personal_Blog_URL"]);
+            if(strpos($burl, "http") !== 0)
+                $burl = "http://" . $burl;
+            if(strrpos($burl, "/") == strlen($burl) - 1)
+                $burl = substr($burl, 0, strlen($burl) - 1);
+
+            $cfg["ExternalURL"] = $burl;
+            $cfg["ExternalUsername"] = trim($_POST["ArtMaps_Use_Personal_Blog_Username"]);
+            $pw = trim($_POST["ArtMaps_Use_Personal_Blog_Password"]);
             if($pw != "")
                 $cfg["ExternalPassword"] = $pw;
         }
@@ -188,6 +195,41 @@ add_filter("body_class",
                     return $var != "singular";
                 });
             }
+            if(is_page_template("template-artwork.php")) {
+                $classes[] = "artmaps-artwork";
+            }
+            if(is_page("Home")) {
+                $classes[] = "artmaps-help";
+            }
+            if(is_page("The Art Map")) {
+                $classes[] = "artmaps-artmap";
+            }
             return $classes;
         }, 99);
+
+if(!function_exists("artmapsComment")) {
+function artmapsComment($comment, $args, $depth) {
+    switch($comment->comment_type) {
+        case "pingback":
+        case "trackback":
+        ?>
+            <li class="artmaps-comment">
+                <div class="artmaps-comment-author"><?= $comment->comment_author; ?></div>
+                <?= $comment->comment_content; ?>
+                <div class="artmaps-comment-link"><a href="<?= $comment->comment_author_url; ?>">Read more</a></div>
+    	<?php
+    	    break;
+        default: break;
+    }
+}}
+
+
+wp_register_script("google-maps",
+        "http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyBDotOtQIdRgtPB6GJnMwRfUEAoluvrdqk");
+wp_register_script("jquery-xcolor", get_stylesheet_directory_uri() . "/js/lib/jquery.xcolor.min.js");
+wp_register_script("markerclusterer", get_stylesheet_directory_uri() . "/js/lib/markerclusterer.js");
+wp_register_script("jquery-bbq", get_stylesheet_directory_uri() . "/js/lib/jquery.ba-bbq.min.js"); 
+wp_register_script("styledmarker", get_stylesheet_directory_uri() . "/js/lib/styledmarker.js");
+wp_register_style("artmaps", get_stylesheet_directory_uri() . "/css/artmaps.css");
+
 ?>

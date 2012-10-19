@@ -5,8 +5,7 @@ $errors = new WP_Error();
 wp_openid_selector_login_head();
 ?>
 <div>
-<h1>Registration</h1>
-<h2>
+<h1>
     From here you can create a new account using either your OpenID
     if you have one or by registering a new username and your email address.
 </h2>

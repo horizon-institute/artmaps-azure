@@ -58,6 +58,7 @@ ArtMaps.ObjectOfInterest = function(o) {
     this.URI = o.URI;
     this.Locations = [];
     this.Metadata = {};
+    this.SuggestionCount = 0;
     
     // Sort actions by location
     var abl = {};
@@ -79,6 +80,7 @@ ArtMaps.ObjectOfInterest = function(o) {
         var loc = o.locations[i];
         var as = abl[loc.ID] ? abl[loc.ID] : [];
         this.Locations[this.Locations.length] = new ArtMaps.Location(loc, this, as);
+        if(loc.source != "SystemImport") this.SuggestionCount++;            
     }
     // Fetch metadata
     var self = this;

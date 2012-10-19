@@ -1,4 +1,5 @@
 <?php
+//TODO: Refactor template/visualisation outside of the class
 if(!class_exists("ArtMapsAdmin")) {
 class ArtMapsAdmin {
 
