@@ -288,7 +288,7 @@ type MetadataController() =
                     raise (Er.NotFound(Er.NotFoundMinorCode.Unspecified))
                 let filters = ArtMaps.Controllers.Metadata.GetFilters(o.URI)
                 let m = filters.[0](o.URI)
-                cache.Add(cname, m) |> ignore
+                cache.Put(cname, m) |> ignore
                 m :> obj
             | _ -> m
 
@@ -346,15 +346,20 @@ type ExternalController() =
     [<WU.CacheHeaderFilter(365, 0, 0, 0)>] 
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
-                s : string) =
+                s : string,
+                p : System.Nullable<int32>) =
         // TODO Rather than stripping these characters, an encoding should
         // be used to prevent collisions between searches
-        let region = RegularExpressions.Regex.Replace(s, @"[^a-zA-Z0-9]", "")
+        let pageno = 
+            match p.HasValue with
+                | true -> p.Value
+                | false -> 1
+        let region = sprintf "%s%i" (RegularExpressions.Regex.Replace(s, @"[^a-zA-Z0-9]", "")) pageno
         cache.CreateRegion(region) |> ignore
         let cached = cache.GetObjectsInRegion(region)
         match cached |> Seq.length  with
             | 0 -> 
-                let result = (s, context) |> ES.GetSearch s 
+                let result = (s, pageno, context) |> ES.GetSearch s 
                 async {
                     try
                         match result with
@@ -373,4 +378,37 @@ type ExternalController() =
                 result
             | 1 -> (cached |> Seq.exactlyOne).Value
             | _ -> cached |> Seq.map (fun e -> e.Value :?> seq<_>) |> Seq.concat :> obj
+
+    (*[<HttpGet>]
+    [<ActionName("Search")>]
+    [<WU.CacheHeaderFilter(365, 0, 0, 0)>] 
+    member this.Get
+            ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
+                s : string) =
+        // TODO Rather than stripping these characters, an encoding should
+        // be used to prevent collisions between searches
+        let region = sprintf "%s%i" (RegularExpressions.Regex.Replace(s, @"[^a-zA-Z0-9]", "")) 1
+        cache.CreateRegion(region) |> ignore
+        let cached = cache.GetObjectsInRegion(region)
+        match cached |> Seq.length  with
+            | 0 -> 
+                let result = (s, 1, context) |> ES.GetSearch s 
+                async {
+                    try
+                        match result with
+                            | :? seq<obj> as sequence -> 
+                                sequence 
+                                    |> Coll.slice 20
+                                    |> Seq.iteri (
+                                        fun i slice -> 
+                                            cache.Put(System.Convert.ToString(i), slice, region) |> ignore)
+                            | _ -> cache.Put(s, result, region) |> ignore
+                    with _ as e ->
+                        sprintf "Error whilst storing search result for '%s' in cache: %s\n%s" 
+                                s e.Message e.StackTrace |> Log.Warning
+                        cache.ClearRegion(region)
+                } |> Async.Start
+                result
+            | 1 -> (cached |> Seq.exactlyOne).Value
+            | _ -> cached |> Seq.map (fun e -> e.Value :?> seq<_>) |> Seq.concat :> obj*)
         

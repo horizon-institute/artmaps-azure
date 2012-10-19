@@ -10,21 +10,20 @@ Version:        0.1.0
 @import url("../twentyeleven/style.css");
 
 #ArtMaps_ArtworkTemplate_ArtworkContainer {
-    width: 500px; 
-    display: table-cell;
-    vertical-align: top;
+
 }
 
 #ArtMaps_ArtworkTemplate_MapContainer {
-    width: 500px; 
-    display: table-cell;
+    height: 400px;
+    margin:10px 50px 10px 20px;
+    clear:both;
 }
 
 #ArtMaps_ArtworkTemplate_ArtworkImage {
     max-width: 500px;
-}
+    width:90%;
+    height:auto!important;
+display:block}
 
-#ArtMaps_ArtworkTemplate_MapFrame {
-    width: 100%;
-    height: 400px;
-}
+
+#ArtMaps_ArtWorkTemplate_ActionsContainer {overflow:hidden; padding:0 20px;}

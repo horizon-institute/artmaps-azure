@@ -1,4 +1,5 @@
 <?php
+//TODO: This should be embedded in a theme template file rather than as an iframe.
 require_once("../../../../wp-config.php");
 /* Defaults */
 $lat = 51.5171;
@@ -20,16 +21,24 @@ if(isset($_GET["c"])) {
 <title>ArtMaps | Tate Galleries</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="description" content="ArtMaps is a crowd-sourcing project for geographic information about artworks held by the Tate galleries." />
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 <link type="text/css" rel=StyleSheet href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/black-tie/jquery-ui.css" />
 <link type="text/css" rel=StyleSheet href="../css/artmaps.css" />
+<script type="text/javascript" src="http://www.google.com/jsapi?key=AIzaSyBDotOtQIdRgtPB6GJnMwRfUEAoluvrdqk"></script>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyBDotOtQIdRgtPB6GJnMwRfUEAoluvrdqk&sensor=true&libraries=places"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://tate.artmaps.wp.horizon.ac.uk/wp-content/themes/artmaps/js/lib/jquery.ba-bbq.min.js"></script>
 <script type="text/javascript" src="../js/jquery.xcolor.min.js"></script>
 <script type="text/javascript" src="../js/json2.js"></script>
 <script type="text/javascript" src="../js/markerclusterer.js"></script>
 <script type="text/javascript" src="../js/styledmarker.js"></script>
 <script type="text/javascript" src="../js/artmaps.js.php"></script>
+<style type="text/css">
+.pac-container {
+    z-index: 9999 !important;
+}
+</style>
 </head>
 <body>
 <noscript>
@@ -43,57 +52,132 @@ var config = {
         "streetViewControl": false,
         "zoom": <?= $zoom ?>,
         "mapTypeId": google.maps.MapTypeId.HYBRID,
-	"mapTypeControlOptions": {
-            "mapTypeIds": [
-                google.maps.MapTypeId.HYBRID,
-                google.maps.MapTypeId.ROADMAP,
-                google.maps.MapTypeId.SATELLITE
-            ]
-        }
+        "zoomControlOptions": {
+            "position": google.maps.ControlPosition.LEFT_CENTER
+        },
+        "panControl": false,
+        "mapTypeControl": false
     },
     "clustererConf" : {
-        "minimumClusterSize": 2
+        "minimumClusterSize": 2,
+        "zoomOnClick": false
     }
 };
+var autocomplete;
 $(function() {
-    new ArtMaps.Map.MapObject($("#ArtMaps_Map_MapContainer").get(0), config);
-
+    var map = new ArtMaps.Map.MapObject($("#ArtMaps_Map_MapContainer").get(0), config);
+    var ac = new google.maps.places.Autocomplete(document.getElementById("ArtMaps_Location_Search"));
+    autocomplete = ac;
+    map.registerAutocomplete(ac);
+    $(".searchbar-link").click(function() {
+        $(".ArtMaps_Popup").remove();
+        $("#ArtMaps_Search_Container").css({"display": "block"}).dialog(
+                {
+                    "dialogClass": "searchbar-popup ArtMaps_Popup",
+                    "close" : function () { $("#ArtMaps_Artwork_Search").autocomplete("close"); }
+                });
+    });
+    $("#ArtMaps_Artwork_Search").autocomplete({
+        "source" : ArtMaps.Search.ArtworkSearch,
+        "minLength" : 3,
+        "select": function(event, ui) {
+            event.preventDefault();
+            if(ui.item.value == -1) return;
+            if(ui.item.value == -10) {
+                $("#ArtMaps_Artwork_Search").autocomplete("search", ui);
+                return;
+            }
+            window.open("/artwork/" + ui.item.value);
+            return;
+        }
+    });
+    $(".map-view-link-button").toggle(
+            function() { $(".map-view-link-menu").stop().show(); },
+            function() { $(".map-view-link-menu").stop().hide(); });
+    $(".map-view-link-menu").find("input").change(function(){
+        switch($(this).val()) {
+        case "hybrid":
+            map.switchMapType(google.maps.MapTypeId.HYBRID);
+            break;
+        case "roadmap":
+            map.switchMapType(google.maps.MapTypeId.ROADMAP);
+            break;
+        case "satellite":
+            map.switchMapType(google.maps.MapTypeId.SATELLITE);
+            break;
+        case "terrain":
+            map.switchMapType(google.maps.MapTypeId.TERRAIN);
+            break;
+        }
+        $(".map-view-link-button").click();
+    });
 });
+
+function ArtMaps_ShowSearch(option) {
+    $(".ArtMaps_Search_Container").css({"display": "none"});
+    switch(option) {
+    case "location":
+        $("#ArtMaps_Location_Search_Container").css({"display": "block"});
+        $("#ArtMaps_Location_Search").val($("#ArtMaps_Artwork_Search").val());
+        google.maps.event.trigger(jQuery("#ArtMaps_Location_Search").get(0), "focus", {});
+        break;
+    case "artwork":
+        $("#ArtMaps_Artwork_Search_Container").css({"display": "block"});
+        $("#ArtMaps_Artwork_Search").val($("#ArtMaps_Location_Search").val());
+        $("#ArtMaps_Artwork_Search").autocomplete("search");
+        break
+    }
+}
+
+jQuery("#ArtMaps_Artwork_Search").blur(function(){
+    ("#ArtMaps_Artwork_Search").autocomplete("close");
+});
+
+function ArtMaps_ArtworkSubmit() {
+    jQuery("#ArtMaps_Artwork_Search").autocomplete("search");
+}
+function ArtMaps_LocationSubmit() {
+    google.maps.event.trigger(jQuery("#ArtMaps_Location_Search").get(0), "focus", {});
+}
 </script>
-<div id="ArtMaps_Map_MapContainer"></div>
-<div id="ArtMaps_Share_Container" style="display:none;">
-<div id="ArtMaps_Share_Container_Accordion">
-    <h3><a href="#">Share</a></h3>
-    <div>
-        <a id="wordpress" class="ArtMaps_Social_Button" title="Blog on WordPress">
-            <img src="../content/social/32/wordpress_32.png" alt="Blog on WordPress" title="Blog on WordPress" /></a>
-        <!--<a id="blogger" class="ArtMaps_Social_Button" title="Blog on Blogger.com">
-            <img src="../content/social/32/blogger_32.png" alt="Blog on Blogger.com" title="Blog on Blogger.com" /></a>-->
-        <a id="facebook" class="ArtMaps_Social_Button" title="Share to Facebook">
-            <img src="../content/social/32/facebook_32.png" alt="Share to Facebook" title="Share to Facebook" /></a>
-        <a id="twitter" class="ArtMaps_Social_Button" title="Tweet this">
-            <img src="../content/social/32/twitter_32.png" alt="Tweet this" title="Tweet this" /></a>
-    </div>
-    <h3><a href="#">Link</a></h3>
-    <div>
-        Copy the url below to link directly to the map as currently displayed.<br />
-        <input
-                type="text" size="50" readonly="readonly"
-                id="ArtMaps_Share_Container_Link"
-                name="ArtMaps_Share_Container_Link"
-                onclick="this.focus();this.select();" />
-    </div>
-    <h3><a href="#">Embed</a></h3>
-    <div>
-        Copy the code below to embed the map as currently displayed in a webpage or blog.<br />
-        <textarea
-                rows="5" cols="40" readonly="readonly"
-                id="ArtMaps_Share_Container_Embed"
-                name="ArtMaps_Share_Container_Embed"
-                onclick="this.focus();this.select();">
-        </textarea>
-    </div>
+<div class="artwork-popup">
+
+		<div class="artwork-popup-inner">
+		Artwork pop-up
+		</div>
+
 </div>
+<div class="searchbar-link"><div class="searchbar-link-button">Search</div></div>
+<div class="map-view-link">
+    <div class="map-view-link-button">View</div>
+    <ul class="map-view-link-menu" style="display: none;">
+        <li><label><input type="radio" name="maptype" value="hybrid" checked="checked" />Hybrid</label></li>
+        <li><label><input type="radio" name="maptype" value="roadmap" />Roadmap</label></li>
+        <li><label><input type="radio" name="maptype" value="satellite" />Satellite</label></li>
+        <li><label><input type="radio" name="maptype" value="terrain" />Terrain</label></li>
+    </ul>
+</div>
+<div id="ArtMaps_Map_MapContainer">
+</div>
+<div id="ArtMaps_Search_Container">
+    <div id="ArtMaps_Artwork_Search_Container" class="ArtMaps_Search_Container">
+        <span>You are searching by keyword</span>
+        <br />
+        <input id="ArtMaps_Artwork_Search" name="ArtMaps_Artwork_Search" type="text"
+                placeholder="Enter a keyword" autocomplete="off" style="display:inline;" />
+        <a href="javascript:ArtMaps_ArtworkSubmit();" class="artmaps-search-button">Search</a>
+        <br />
+        <a href="javascript:ArtMaps_ShowSearch('location');">Search map for locations</a>
+    </div>
+    <div id="ArtMaps_Location_Search_Container" class="ArtMaps_Search_Container" style="display:none;">
+        <span>You are searching the map for locations</span>
+        <br />
+        <input id="ArtMaps_Location_Search" name="ArtMaps_Location_Search" type="text"
+                placeholder="Enter a location" autocomplete="off" style="display:inline;" />
+        <a href="javascript:ArtMaps_LocationSubmit();" class="artmaps-search-button">Search</a>
+        <br />
+        <a href="javascript:ArtMaps_ShowSearch('artwork');">Search by keyword instead</a>
+    </div>
 </div>
 </body>
 </html>

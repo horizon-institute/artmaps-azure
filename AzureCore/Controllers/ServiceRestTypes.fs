@@ -260,6 +260,18 @@ type User = {
                 signature = null
             }
 
+        let ObjectToObjectSearchRecord (o : Entities.ObjectOfInterest) =
+            {
+                ObjectOfInterest.ID = o.ID
+                URI = o.URI
+                locations = o.Locations |> Seq.choose LocationToLocationRecord |> List.ofSeq |> Seq.ofList
+                actions = o.Actions |> Seq.map ActionToActionRecord |> List.ofSeq |> Seq.ofList
+                username = null
+                userLevel = null
+                timestamp = 0L
+                signature = null
+            }
+
         let XmlToLocationRecords(xml : string) =
             let doc = XDocument.Load(new StringReader(xml))
             query {

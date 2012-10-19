@@ -1,12 +1,15 @@
 <?php
+//TODO: This functionality should be called via an XML-RPC request
+error_log("ArtMaps: Deprecation warning\n" . __FILE__);
 require_once("../../../../wp-config.php");
-header("Content-type: text/plain", true);
+header("Content-type: application/json", true);
 
 global $current_user;
 get_currentuserinfo();
 $cfg = getUsersArtMapsBlog($current_user);
 
 $aid = $_GET["artworkID"];
+$objectID = $aid;
 
 $url = $cfg["IsInternal"] ? $cfg["InternalURL"] : $cfg["ExternalURL"];
 $un = $cfg["IsInternal"] ? $cfg["InternalUsername"] : $cfg["ExternalUsername"];;
@@ -19,23 +22,7 @@ if(!$md) {
     return;
 }
 
-$content = "";
-
-if(isset($md->imageurl)) {
-    $content .= <<<EOT
-<img id="ArtMaps_ArtworkTemplate_ArtworkImage"
-    src="$md->imageurl" alt="$md->title" style="max-width: 200px; max-height: 200px;" />
-
-EOT;
-}
-$link = get_site_url() . "/artwork/" . $aid;
-$content .= <<<EOT
-Artist: $md->artist $md->artistdate
-Title: $md->title
-Date: $md->artworkdate
-Reference: $md->reference
-Artwork Website: <a href="$link">$link</a>
-EOT;
+include("../php/templates/comment.php");
 
 $request = <<<EOT
 <?xml version="1.0" encoding="iso-8859-1"?>
@@ -87,6 +74,15 @@ if(strpos($data, "fault") > -1) {
 }
 else {
     $postID = preg_replace("/.*<int>(\d+).*/s", '$1', $data);
-    echo "\"" . $url . "/wp-admin/post.php?post=" . $postID . "&action=edit" . "\"";
+    $redirect = "wp-admin/post.php?post=" . $postID . "&action=edit";
+    $res = <<<EOT
+    {
+        "url": "$url/wp-login.php",
+        "username": "$un",
+        "password": "$pass",
+        "redirect": "$redirect"
+    }
+EOT;
+    echo $res;
 }
 ?>

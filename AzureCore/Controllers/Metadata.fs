@@ -45,7 +45,7 @@ module Filters =
 
         let metadata =
             try
-                let imageurl = (IMAGE_URL (root.SelectNodes("//div[@class='image_box']/a/img").[0].Attributes.["src"].Value)) :> obj
+                let imageurl = (IMAGE_URL (root.SelectNodes("//div[@class='image_box']//img").[0].Attributes.["src"].Value)) :> obj
                 [("imageurl", imageurl)] |> Map.ofList
             with _ -> Map.empty<string, obj>
 
