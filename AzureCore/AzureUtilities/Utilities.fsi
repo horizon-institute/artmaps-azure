@@ -2,26 +2,22 @@
 
 module ArtMaps.Azure.Utilities
 
-module Cache =
-    
-    val clearMetadata : unit -> unit
-
 module Configuration = 
 
     type DevFabricTraceListener =
         inherit System.Diagnostics.TraceListener
         new : string * string -> DevFabricTraceListener   
             
-    val inline Value<'T> : string -> 'T
+    val inline value<'T> : string -> 'T
 
-    val Settings : unit -> unit
+    val initSettings : unit -> unit
 
-    val Diagnostics : unit -> unit
+    val initDiagnostics : unit -> unit
 
-    val Storage : unit -> unit
+    val initStorage : unit -> unit
 
 module Resources =
     
     val MasterKey : byte[]
 
-    val Resource : string -> System.IO.Stream
+    val readOnly : string -> System.IO.Stream

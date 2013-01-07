@@ -12,6 +12,6 @@ type t = {
     getNextID : obj -> int64
 }
     
-val CreateAdminContext : byte[] -> ModelDataContext -> t
+val forAdmin : byte[] -> ModelDataContext -> t
     
-val CreateServiceContext : string -> ModelDataContext -> t option
+val forService : string -> ModelDataContext -> t option

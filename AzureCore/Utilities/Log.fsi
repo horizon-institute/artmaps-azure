@@ -2,8 +2,8 @@
 
 module ArtMaps.Utilities.Log
 
-val Information : string -> unit
+val information : string -> unit
 
-val Warning : string -> unit
+val warning : string -> unit
 
-val Error : string -> unit
+val error : string -> unit

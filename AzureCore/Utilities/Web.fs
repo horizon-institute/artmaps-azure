@@ -20,12 +20,7 @@ module AU = ArtMaps.Azure.Utilities
 module CTX = ArtMaps.Context
 module R = Reflection
 
-
-type AdminContextAttribute() = 
-    inherit Attribute()
-
-
-type RecordConverter() =
+type JsonRecordConverter() =
     inherit JsonConverter()
     
     override this.CanRead with get () = true
@@ -61,7 +56,7 @@ type RecordConverter() =
                     | JsonToken.Boolean -> Convert.ToBoolean(reader.Value) :> obj
                     | JsonToken.Null -> null
                     | x -> 
-                        sprintf "Unable to process JsonType %s" (x.ToString()) |> Log.Warning
+                        sprintf "Unable to process JsonType %s" (x.ToString()) |> Log.warning
                         null
             values.Add(name, value)
 
@@ -70,7 +65,7 @@ type RecordConverter() =
                 | true -> values.[field.Name]
                 | false ->
                     match field with
-                        | f when R.IsListType(field.PropertyType) -> 
+                        | f when R.isListType(field.PropertyType) -> 
                             let empty = f.PropertyType.GetProperty("Empty")
                             empty.GetValue(null, [||])
                         | _ -> null
@@ -99,13 +94,11 @@ type RecordBinder() =
                             match vpr with
                                 | null -> null
                                 | _ -> 
-                                    match R.IsOptionType(f.PropertyType) with
+                                    match R.isOptionType(f.PropertyType) with
                                         | false -> vpr.ConvertTo(f.PropertyType)
                                         | true -> 
                                             let ot = (f.PropertyType.GetGenericArguments()).[0]
-                                            let go = R.GenericOptionType.MakeGenericType([| ot |])
-                                            let con = go.GetConstructor([| ot |])
-                                            con.Invoke([| vpr.ConvertTo(ot) |])
+                                            R.makeOption ot (vpr.ConvertTo(ot))
                 )
         cons args
 
@@ -119,10 +112,14 @@ type RecordBinder() =
 
 type RecordBinderProvider() =
     inherit ModelBinderProvider()
-    override this.GetBinder(configuration, bindingContext) =
-        match FSharpType.IsRecord(bindingContext.ModelType) with
+    override this.GetBinder(configuration, modelType) =
+        match FSharpType.IsRecord(modelType) with
             | true -> new RecordBinder() :> IModelBinder
             | false -> null
+
+
+type AdminContextAttribute() = 
+    inherit Attribute()
 
 
 type ContextBinder() =
@@ -130,24 +127,36 @@ type ContextBinder() =
     override this.BindModel(actionContext, bindingContext) =
         let cnt = actionContext.ControllerContext.Controller
         let ctx = new ModelDataContext(
-                    AU.Configuration.Value<string>("ArtMaps.SqlServer.ConnectionString"))
+                    AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
         bindingContext.Model <- 
-            try
-                cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, false).Single() |> ignore
-                CTX.CreateAdminContext AU.Resources.MasterKey ctx :> obj
-            with _ ->
+            if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
+                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
+            else
                 let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
-                match CTX.CreateServiceContext name ctx with
+                match CTX.forService name ctx with
                     | Some(c) -> c :> obj
                     | None -> null
         actionContext.Request.Properties.Add("context", bindingContext.Model)
         true
 
+type MvcContextBinder() =
+    interface System.Web.Mvc.IModelBinder with
+        member this.BindModel(controllerContext, bindingContext) =
+            let cnt = controllerContext.Controller
+            let ctx = new ModelDataContext(
+                        AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
+            if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
+                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
+            else
+                let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
+                match CTX.forService name ctx with
+                    | Some(c) -> c :> obj
+                    | None -> null
 
 type ContextBinderProvider() =
     inherit ModelBinderProvider()
-    override this.GetBinder(configuration, bindingContext) =
-        match bindingContext.ModelType.IsAssignableFrom(typeof<CTX.t>) with
+    override this.GetBinder(configuration, modelType) =
+        match modelType.IsAssignableFrom(typeof<CTX.t>) with
             | true -> new ContextBinder() :> IModelBinder
             | false -> null
 
@@ -164,6 +173,27 @@ type ValidContextFilter() =
                 ctx.Response <- new Net.Http.HttpResponseMessage(Net.HttpStatusCode.NotFound))
 
 
+type DepthBinder() =
+    inherit MutableObjectModelBinder()  
+    override this.BindModel(actionContext, bindingContext) =
+        bindingContext.Model <- 
+            try 
+                let h = actionContext.Request.Headers.Accept |> Seq.head
+                let v = h.Parameters.Single(fun n -> n.Name = "depth")
+                let i = Convert.ToInt32(v.Value)
+                if i < 1 then 1 else i
+            with _ -> 1
+        true
+
+
+type DepthBinderProvider() =
+    inherit ModelBinderProvider()
+    override this.GetBinder(configuration, modelType) =
+        match modelType.IsAssignableFrom(typeof<Int32>) with
+            | true -> new DepthBinder() :> IModelBinder
+            | false -> null
+
+
 type EncodingBinder() =
     inherit MutableObjectModelBinder()  
     override this.BindModel(actionContext, bindingContext) =
@@ -175,16 +205,18 @@ type EncodingBinder() =
 
 type EncodingBinderProvider() =
     inherit ModelBinderProvider()
-    override this.GetBinder(configuration, bindingContext) =
-        match bindingContext.ModelType.IsAssignableFrom(typeof<Encoding>) with
+    override this.GetBinder(configuration, modelType) =
+        match modelType.IsAssignableFrom(typeof<Encoding>) with
             | true -> new EncodingBinder() :> IModelBinder
             | false -> null
+
 
 type ExceptionLoggingFilter() =
     inherit ExceptionFilterAttribute()
     override this.OnException(context) =
         let e = context.Exception
-        sprintf "%s\n%s" e.Message e.StackTrace |> Log.Error
+        sprintf "%s\n%s" e.Message e.StackTrace |> Log.error
+
 
 type CacheHeaderFilter(seconds : int64) =
     inherit ActionFilterAttribute()
@@ -196,4 +228,4 @@ type CacheHeaderFilter(seconds : int64) =
             h.MaxAge <- new Nullable<TimeSpan>(TimeSpan.FromSeconds(float seconds))
             ctx.Response.Headers.CacheControl <- h
         with _ as e ->
-            sprintf "Unable to set cache response header: %s\n%s" e.Message e.StackTrace |> Log.Warning
+            sprintf "Unable to set cache response header: %s\n%s" e.Message e.StackTrace |> Log.warning

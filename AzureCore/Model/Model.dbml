@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Database Name="artmapsdev" EntityNamespace="ArtMaps.Persistence.Entities" ContextNamespace="ArtMaps.Persistence.Context" Class="ModelDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="artmapsdev" EntityNamespace="ArtMaps.Persistence.Entities" ContextNamespace="ArtMaps.Persistence.Context" Class="ModelDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Table Name="dbo.Action" Member="Actions">
     <Type Name="Action">
       <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -7,6 +8,8 @@
       <Column Name="ObjectID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="DateTime" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Association Name="Action_ActionLocation" Member="ActionLocations" ThisKey="ID,ContextID" OtherKey="ActionID,ContextID" Type="ActionLocation" />
+      <Association Name="Action_PingbackAction" Member="PingbackActions" ThisKey="ID,ContextID" OtherKey="ActionID,ContextID" Type="PingbackAction" />
       <Association Name="ObjectOfInterest_Action" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
       <Association Name="User_Action" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
@@ -15,7 +18,6 @@
     <Type Name="Context">
       <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="Name" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
-      <Column Name="Endpoint" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
       <Column Name="[Key]" Member="Key" Type="System.Data.Linq.Binary" DbType="VarBinary(MAX) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
     </Type>
   </Table>
@@ -29,6 +31,8 @@
       <Association Name="Location_LocationEllipse" Member="LocationEllipses" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationEllipse" />
       <Association Name="Location_LocationPoint" Member="LocationPoints" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationPoint" />
       <Association Name="Location_LocationPolygon" Member="LocationPolygons" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="LocationPolygon" />
+      <Association Name="Location_ActionLocation" Member="ActionLocations" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="ActionLocation" />
+      <Association Name="Location_PingbackLocation" Member="PingbackLocations" ThisKey="ID,ContextID" OtherKey="LocationID,ContextID" Type="PingbackLocation" />
       <Association Name="ObjectOfInterest_Location" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
@@ -59,6 +63,8 @@
       <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
       <Association Name="ObjectOfInterest_Action" Member="Actions" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="Action" />
       <Association Name="ObjectOfInterest_Location" Member="Locations" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="Location" />
+      <Association Name="ObjectOfInterest_ObjectMetadata" Member="ObjectMetadatas" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="ObjectMetadata" />
+      <Association Name="ObjectOfInterest_PingbackObject" Member="PingbackObjects" ThisKey="ID,ContextID" OtherKey="ObjectID,ContextID" Type="PingbackObject" />
     </Type>
   </Table>
   <Table Name="dbo.[User]" Member="Users">
@@ -67,16 +73,7 @@
       <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
       <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
       <Association Name="User_Action" Member="Actions" ThisKey="ID,ContextID" OtherKey="UserID,ContextID" Type="Action" />
-      <Association Name="User_UserObject" Member="UserObjects" ThisKey="ID,ContextID" OtherKey="UserID,ContextID" Type="UserObject" />
-    </Type>
-  </Table>
-  <Table Name="dbo.UserObject" Member="UserObjects">
-    <Type Name="UserObject">
-      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="URI" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
-      <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Association Name="User_UserObject" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="User_PingbackUser" Member="PingbackUsers" ThisKey="ID,ContextID" OtherKey="UserID,ContextID" Type="PingbackUser" />
     </Type>
   </Table>
   <Table Name="dbo.LocationEllipse" Member="LocationEllipses">
@@ -110,6 +107,79 @@
       <Association Name="Location_LocationPolygon" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
+  <Table Name="dbo.ActionLocation" Member="ActionLocations">
+    <Type Name="ActionLocation">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ActionID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Action_ActionLocation" Member="Action" ThisKey="ActionID,ContextID" OtherKey="ID,ContextID" Type="Action" IsForeignKey="true" />
+      <Association Name="Location_ActionLocation" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ObjectMetadata" Member="ObjectMetadatas">
+    <Type Name="ObjectMetadata">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Value" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Association Name="ObjectOfInterest_ObjectMetadata" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Pingback" Member="Pingbacks">
+    <Type Name="Pingback">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="DateTime" Type="System.DateTime" DbType="DateTime2 NOT NULL" CanBeNull="false" />
+      <Association Name="Pingback_PingbackAction" Member="PingbackActions" ThisKey="ID,ContextID" OtherKey="PingbackID,ContextID" Type="PingbackAction" />
+      <Association Name="Pingback_PingbackLocation" Member="PingbackLocations" ThisKey="ID,ContextID" OtherKey="PingbackID,ContextID" Type="PingbackLocation" />
+      <Association Name="Pingback_PingbackObject" Member="PingbackObjects" ThisKey="ID,ContextID" OtherKey="PingbackID,ContextID" Type="PingbackObject" />
+      <Association Name="Pingback_PingbackUser" Member="PingbackUsers" ThisKey="ID,ContextID" OtherKey="PingbackID,ContextID" Type="PingbackUser" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PingbackAction" Member="PingbackActions">
+    <Type Name="PingbackAction">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PingbackID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="ActionID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Action_PingbackAction" Member="Action" ThisKey="ActionID,ContextID" OtherKey="ID,ContextID" Type="Action" IsForeignKey="true" />
+      <Association Name="Pingback_PingbackAction" Member="Pingback" ThisKey="PingbackID,ContextID" OtherKey="ID,ContextID" Type="Pingback" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PingbackLocation" Member="PingbackLocations">
+    <Type Name="PingbackLocation">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PingbackID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="LocationID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Location_PingbackLocation" Member="Location" ThisKey="LocationID,ContextID" OtherKey="ID,ContextID" Type="Location" IsForeignKey="true" />
+      <Association Name="Pingback_PingbackLocation" Member="Pingback" ThisKey="PingbackID,ContextID" OtherKey="ID,ContextID" Type="Pingback" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PingbackObject" Member="PingbackObjects">
+    <Type Name="PingbackObject">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PingbackID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="ObjectOfInterest_PingbackObject" Member="ObjectOfInterest" ThisKey="ObjectID,ContextID" OtherKey="ID,ContextID" Type="ObjectOfInterest" IsForeignKey="true" />
+      <Association Name="Pingback_PingbackObject" Member="Pingback" ThisKey="PingbackID,ContextID" OtherKey="ID,ContextID" Type="Pingback" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.PingbackUser" Member="PingbackUsers">
+    <Type Name="PingbackUser">
+      <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ContextID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="PingbackID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Association Name="Pingback_PingbackUser" Member="Pingback" ThisKey="PingbackID,ContextID" OtherKey="ID,ContextID" Type="Pingback" IsForeignKey="true" />
+      <Association Name="User_PingbackUser" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
   <Function Name="dbo.NextID" Method="NextID">
     <Parameter Name="TableName" Parameter="tableName" Type="System.String" DbType="NVarChar(50)" />
     <ElementType Name="NextIDResult">
@@ -129,5 +199,13 @@
       <Column Name="Locations" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="Actions" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
     </ElementType>
+  </Function>
+  <Function Name="dbo.SelectObjectsWithinBoundsV2" Method="SelectObjectsWithinBoundsV2" IsComposable="true">
+    <Parameter Name="north" Type="System.Double" DbType="Float" />
+    <Parameter Name="south" Type="System.Double" DbType="Float" />
+    <Parameter Name="east" Type="System.Double" DbType="Float" />
+    <Parameter Name="west" Type="System.Double" DbType="Float" />
+    <Parameter Name="contextID" Type="System.Int64" DbType="BigInt" />
+    <Return Type="object" />
   </Function>
 </Database>

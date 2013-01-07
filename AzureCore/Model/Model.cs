@@ -1,6 +1,6 @@
 namespace ArtMaps.Persistence.Context
 {
-	using System.Data.Linq;
+    using System.Data.Linq;
     using System.Linq;
 
     public partial class ModelDataContext : System.Data.Linq.DataContext
@@ -23,6 +23,23 @@ namespace ArtMaps.Persistence.Entities
     using Microsoft.SqlServer.Types;
     using System.Data.Linq;
     using System.Linq;
+
+    public enum MetadataValueType
+    {
+        TextPlain = -1,
+        TextHTML,
+        LinkDefault,
+        LinkImage
+    }
+
+    partial class ObjectMetadata
+    {
+        public MetadataValueType ValueType
+        {
+            get { return (MetadataValueType)this.Type; }
+            set { this.Type = (short)value; }
+        }
+    }
 
     public enum LocationSource
     {
@@ -50,7 +67,7 @@ namespace ArtMaps.Persistence.Entities
 
         public LocationType LocationType
         {
-            get 
+            get
             {
                 if (this.LocationPoint != null)
                     return LocationType.Point;
@@ -84,7 +101,7 @@ namespace ArtMaps.Persistence.Entities
             get { return this.LocationNameds.FirstOrDefault(l => true); }
         }
     }
-    
+
     partial class LocationPoint
     {
         public SqlGeography Center

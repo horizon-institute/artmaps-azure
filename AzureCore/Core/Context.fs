@@ -28,7 +28,7 @@ let verify (key : byte[]) (data : byte[]) (signature : obj) =
         | :? (byte[]) as sign -> rsa.VerifyData(data, sha, sign)
         | _ -> raise (new NotSupportedException("Unknown signature type"))
 
-let CreateAdminContext (key : byte[]) (ctx : ModelDataContext) = 
+let forAdmin (key : byte[]) (ctx : ModelDataContext) = 
     ctx.Connection.Open()
     ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
     { 
@@ -39,7 +39,7 @@ let CreateAdminContext (key : byte[]) (ctx : ModelDataContext) =
         getNextID = (fun o -> ctx.GetNextID(o))
     }
 
-let CreateServiceContext (name : string) (ctx : ModelDataContext) = 
+let forService (name : string) (ctx : ModelDataContext) = 
     ctx.Connection.Open()
     ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
     match ctx.Contexts.SingleOrDefault(fun (c : Context) -> c.Name = name) with

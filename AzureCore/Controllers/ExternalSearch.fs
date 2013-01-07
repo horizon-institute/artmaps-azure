@@ -4,7 +4,7 @@ module ArtMaps.Controllers.ExternalSearch
 
 module Searches =
 
-    module Conv = ArtMaps.Controllers.Types.Conversions
+    module Conv = ArtMaps.Controllers.Types.V1.Conversions
     module CTX = ArtMaps.Context
     module Log = ArtMaps.Utilities.Log
 
@@ -51,7 +51,7 @@ module Searches =
         let SEARCH_URL = sprintf "%s/art/artists?wv=list&q=%s&ap=%i" BASE_URL ref
         
         let getpage page = 
-            sprintf "Fetching page %i for search '%s'" page uri |> Log.Information
+            sprintf "Fetching page %i for search '%s'" page uri |> Log.information
             let req = WebRequest.Create(SEARCH_URL page) :?> HttpWebRequest
             req.UserAgent <- USER_AGENT
             req.KeepAlive <- true
@@ -82,7 +82,7 @@ module Searches =
         try
             let min = ((pageno - 1) * 3) + 1
             let max = min + 2
-            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.Information
+            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.information
             seq { min..max } 
                 |> Seq.map (fun i -> async { 
                                         return 
@@ -97,7 +97,7 @@ module Searches =
                 |> Seq.ofArray
                 |> Seq.concat
         with _ as e -> 
-            sprintf "Fail: %s\n%s" e.Message e.StackTrace |> Log.Error
+            sprintf "Fail: %s\n%s" e.Message e.StackTrace |> Log.error
             Seq.empty
         
     [<SearchUriMatch("^tateartwork://.*$")>]
@@ -108,7 +108,7 @@ module Searches =
         let SEARCH_URL = sprintf "%s/art/artworks?wv=list&q=%s&wp=%i" BASE_URL ref
         
         let getpage page = 
-            sprintf "Fetching page %i for search '%s'" page uri |> Log.Information
+            sprintf "Fetching page %i for search '%s'" page uri |> Log.information
             let req = WebRequest.Create(SEARCH_URL page) :?> HttpWebRequest
             req.UserAgent <- USER_AGENT
             req.KeepAlive <- true
@@ -148,7 +148,7 @@ module Searches =
         try
             let min = ((pageno - 1) * 3) + 1
             let max = min + 2
-            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.Information
+            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.information
             seq { min..max } 
                 |> Seq.map (fun i -> async { 
                                         return 
@@ -156,7 +156,7 @@ module Searches =
                                                 i |> getpage |> getartworks 
                                             with _ as e -> 
                                                 sprintf "Unable to get page %i for search '%s': %s\n%s" 
-                                                    i uri e.Message e.StackTrace |> Log.Warning
+                                                    i uri e.Message e.StackTrace |> Log.warning
                                                 Seq.empty })
                 |> Async.Parallel
                 |> Async.RunSynchronously
@@ -173,7 +173,7 @@ module Searches =
         let SEARCH_URL = sprintf "%s/art/artworks?wv=list&aid=%s&wp=%i" BASE_URL ref
         
         let getpage page = 
-            sprintf "Fetching page %i for search '%s'" page uri |> Log.Information
+            sprintf "Fetching page %i for search '%s'" page uri |> Log.information
             let req = WebRequest.Create(SEARCH_URL page) :?> HttpWebRequest
             req.UserAgent <- USER_AGENT
             req.KeepAlive <- true
@@ -213,7 +213,7 @@ module Searches =
         try
             let min = ((pageno - 1) * 3) + 1
             let max = min + 2
-            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.Information
+            sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.information
             seq { min..max } 
                 |> Seq.map (fun i -> async { 
                                         return 
@@ -221,7 +221,7 @@ module Searches =
                                                 i |> getpage |> getartworks 
                                             with _ as e -> 
                                                 sprintf "Unable to get page %i for search '%s': %s\n%s" 
-                                                    i uri e.Message e.StackTrace |> Log.Warning
+                                                    i uri e.Message e.StackTrace |> Log.warning
                                                 Seq.empty })
                 |> Async.Parallel
                 |> Async.RunSynchronously
@@ -259,7 +259,7 @@ let SearchMap =
         let fmod = mmod.GetNestedType("Searches")
         fmod.GetMethods() |> Array.fold getSearches Map.empty<S.SearchUriMatch, Search>
     with _ as e ->
-        sprintf "%s\n%s" e.Message e.StackTrace |> Log.Error
+        sprintf "%s\n%s" e.Message e.StackTrace |> Log.error
         Map.empty<S.SearchUriMatch, Search>
 
 let GetSearch (uri : string) =

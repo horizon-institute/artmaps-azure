@@ -8,13 +8,18 @@ let GenericOptionType = (typeof<Option<_>>).GetGenericTypeDefinition()
 
 let GenericListType = (typeof<List<_>>).GetGenericTypeDefinition()
 
-let IsGenericAssignable (gt : Type) (t : Type) =
+let isGenericAssignable (gt : Type) (t : Type) =
     match t.IsGenericType with
         | false -> false
         | true -> 
             t.GetGenericTypeDefinition()
                     .IsAssignableFrom(gt)
 
-let IsOptionType = IsGenericAssignable GenericOptionType
+let isOptionType = isGenericAssignable GenericOptionType
 
-let IsListType = IsGenericAssignable GenericListType
+let isListType = isGenericAssignable GenericListType
+
+let makeOption (t : Type) (value : obj) =
+    let ot = GenericOptionType.MakeGenericType([| t |])
+    let con = ot.GetConstructor([| t |])
+    con.Invoke([| value |])

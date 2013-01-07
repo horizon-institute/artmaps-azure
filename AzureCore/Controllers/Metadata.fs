@@ -2,13 +2,28 @@
 
 module ArtMaps.Controllers.Metadata
 
+module CTX = ArtMaps.Context
+
+type t = {
+    ID : int64
+    name : string
+    value : string
+    valueType : string
+}
+
+
 module Filters =
 
+    open ArtMaps.Persistence.Entities
     open HtmlAgilityPack
     open System
+    open System.Data.Linq
     open System.IO
+    open System.Linq
     open System.Net
     open System.Text.RegularExpressions
+
+    module Util = ArtMaps.Utilities.General
 
     [<AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = true)>]
     type FilterUriMatch(pattern : string) =
@@ -22,8 +37,25 @@ module Filters =
         interface IComparable with
             member this.CompareTo(other) = this.GetHashCode().CompareTo(other.GetHashCode())
 
+    [<Literal>] 
+    let ArtMapsFilterRegexString = @"^artmaps:\/\/(.*)$"
+    let ArtMapsFilterRegex = new Regex(ArtMapsFilterRegexString)
+    [<FilterUriMatch(ArtMapsFilterRegexString)>]
+    let ArtMapsFilter (context : CTX.t) (uri : string) =
+        ArtMaps.Utilities.Log.information (ArtMapsFilterRegex.Match(uri).Groups.[1].Value)
+        let id = Convert.ToInt64(ArtMapsFilterRegex.Match(uri).Groups.[1].Value)
+        let o = context.dataContext.ObjectOfInterests.Single(fun (o : ObjectOfInterest) -> o.ID = id)
+        let conv (om : ObjectMetadata) =
+            {
+                t.ID = om.ID
+                name = om.Name
+                value = om.Value
+                valueType = Util.enumName om.ValueType
+            }
+        o.ObjectMetadatas |> Seq.map conv |> List.ofSeq
+
     [<FilterUriMatch("^tatecollection://.*$")>]
-    let TateCollectionFilter (uri : string) =
+    let TateCollectionFilter (context : CTX.t) (uri : string) =
         let USER_AGENT = @"ArtMapsCore/1.0"
         let BASE_URL = "http://www.tate.org.uk"
         let ARTWORK_URL = sprintf "%s/art/artworks/%s" BASE_URL
@@ -45,9 +77,9 @@ module Filters =
 
         let metadata =
             try
-                let imageurl = (IMAGE_URL (root.SelectNodes("//div[@class='image_box']//img").[0].Attributes.["src"].Value)) :> obj
-                [("imageurl", imageurl)] |> Map.ofList
-            with _ -> Map.empty<string, obj>
+                let imageurl = (IMAGE_URL (root.SelectNodes("//div[@class='image_box']//img").[0].Attributes.["src"].Value))
+                [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
+            with _ -> List.empty<t>
 
         let paths = [
             ("artist", "//div[@id='region-sidebar-artwork']//span[@class='infoWorkArtName']")
@@ -58,34 +90,52 @@ module Filters =
         ] 
         paths
             |> List.fold (
-                fun (acc : Map<string, obj>) (name, path) -> 
+                fun (acc : t list) (name, path) -> 
                     try
-                        acc.Add(name, (doc.DocumentNode.SelectNodes(path) |> Seq.head).InnerText :> obj)
+                        acc @ [{ 
+                                t.ID = -1L;
+                                t.name = name;
+                                t.value = (doc.DocumentNode.SelectNodes(path) |> Seq.head).InnerText;
+                                t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.TextPlain)}]
                     with _ -> acc
                 ) metadata
+
 
 open System.Reflection
 
 module F = Filters
 module Log = ArtMaps.Utilities.Log
 
+type FilterFun = CTX.t -> string -> t list
+
 let FilterMap =
     try
-        let getfilters (m : MethodInfo) (acc : Map<Filters.FilterUriMatch, (string -> Map<string, obj>)>) =
-            let filterfunc (s : string) =  m.Invoke(null, [| s |]) :?> Map<string, obj>
-            m.GetCustomAttributes(typeof<Filters.FilterUriMatch>, false)
+        let getfilters (m : MethodInfo) (acc : Map<Filters.FilterUriMatch, FilterFun>) =
+            let filterfunc (c : CTX.t) (s : string) =  m.Invoke(null, [| c; s |]) :?> t list
+            m.GetCustomAttributes(typeof<Filters.FilterUriMatch>, true)
                 |> Array.fold 
-                (fun (accc : Map<Filters.FilterUriMatch, (string -> Map<string, obj>)>) a -> 
+                (fun (accc : Map<Filters.FilterUriMatch, FilterFun>) a -> 
                     let matcher = a :?> Filters.FilterUriMatch
                     accc.Add(matcher, filterfunc)) acc
 
         let mmod = Assembly.GetExecutingAssembly().GetTypes() 
-                    |> Array.find (fun t -> (sprintf "%s.%s" t.Namespace t.Name) = "ArtMaps.Controllers.Metadata")
+                    |> Array.find (fun t -> (sprintf "%A" t) = "ArtMaps.Controllers.Metadata")
         let fmod = mmod.GetNestedType("Filters")
-        fmod.GetMethods() 
-            |> Array.fold (fun acc m -> getfilters m acc) Map.empty<Filters.FilterUriMatch, (string -> Map<string, obj>)>
+        fmod.GetMethods()
+            |> Array.fold (fun acc m -> getfilters m acc) Map.empty<Filters.FilterUriMatch, FilterFun>
     with _ as e ->
-        Map.empty<Filters.FilterUriMatch, (string -> Map<string, obj>)>
+        sprintf "%s\n%s" e.Message e.StackTrace |> Log.error
+        Map.empty<Filters.FilterUriMatch, FilterFun>
 
-let GetFilters (uri : string) =
-    FilterMap |> Map.fold (fun acc k v -> if k.IsFilterFor uri then List.Cons(v, acc) else acc) List.empty<(string -> Map<string, obj>)>
+let filtersFor (uri : string) =
+    FilterMap |> Map.fold (fun acc k v -> if k.IsFilterFor uri then List.Cons(v, acc) else acc) List.empty<FilterFun>
+
+let fetch (context : CTX.t) (uri : string) = 
+    let filters = filtersFor uri
+    match filters.IsEmpty with
+        | true -> List<t>.Empty
+        | _ -> filters.[0] context uri
+
+let fetchV1 (context : CTX.t) (uri : string) = 
+    let md = fetch context uri
+    md |> List.map (fun d -> (d.name, d.value :> obj)) |> Map.ofList

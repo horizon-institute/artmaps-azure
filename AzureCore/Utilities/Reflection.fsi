@@ -2,8 +2,8 @@
 
 module ArtMaps.Utilities.Reflection
 
-val GenericOptionType : System.Type
+val isOptionType : (System.Type -> bool)
 
-val IsOptionType : (System.Type -> bool)
+val isListType : (System.Type -> bool)
 
-val IsListType : (System.Type -> bool)
+val makeOption : System.Type -> obj -> obj
