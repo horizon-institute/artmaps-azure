@@ -2,6 +2,10 @@
 
 module ArtMaps.Azure.Utilities
 
+module Cache =
+    
+    val clearMetadata : unit -> unit
+
 module Configuration = 
 
     type DevFabricTraceListener =
