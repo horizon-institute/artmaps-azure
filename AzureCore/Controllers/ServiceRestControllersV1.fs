@@ -29,6 +29,7 @@ type ObjectsOfInterestV1Controller() =
 
     [<HttpGet>]
     [<ActionName("Search")>] 
+    [<WU.CacheHeaderFilter(0, 1, 0, 0)>] 
     member this.Search
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 [<FromUri>]qp : Types.V1.OoIQueryParameters) =      
@@ -171,17 +172,21 @@ type ActionsV1Controller() =
         context.dataContext.Actions.InsertOnSubmit(a)
 
         let r = new Regex("^suggestion://(.*)$")
-        let jo = JObject.Parse(r.Match(action.URI).Groups.[0].Value)
-        match jo.["LocationID"] with
-            | null -> ()
-            | l ->
-                let lid = System.Convert.ToInt64(l)
-                let l = context.dataContext.Locations.SingleOrDefault(fun (l : Location) -> l.ID = lid)
-                let al = new ActionLocation()
-                al.ID <- context.getNextID(a :> obj)
-                al.Action <- a
-                al.Location <- l
-                context.dataContext.ActionLocations.InsertOnSubmit(al)        
+        try
+            let jo = JObject.Parse(r.Match(action.URI).Groups.[1].Value)
+            match jo.["LocationID"] with
+                | null -> ()
+                | l ->
+                    let v = l :?> JValue
+                    let lid = System.Convert.ToInt64(v.Value)
+                    let l = context.dataContext.Locations.SingleOrDefault(fun (l : Location) -> l.ID = lid)
+                    let al = new ActionLocation()
+                    al.ID <- context.getNextID(a :> obj)
+                    al.Action <- a
+                    al.Location <- l
+                    context.dataContext.ActionLocations.InsertOnSubmit(al)
+        with _ -> ()
+                
         
         context.dataContext.SubmitChanges()
         a |> Conv.ActionToActionRecord
