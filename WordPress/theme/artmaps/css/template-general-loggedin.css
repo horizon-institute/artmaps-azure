@@ -1,0 +1,54 @@
+@CHARSET "UTF-8";
+
+body {
+    margin-top: 40px !important;
+}
+
+.artmaps-navigation-link {
+    position: fixed;
+    top: 28px;
+    width: 33%;
+    height: 40px;
+    background: #444;
+    color: #fff;
+    z-index: 10;
+    font-size: 12px;
+    line-height: 40px;
+    text-align: center;
+    overflow: hidden;
+}
+
+#artmaps-navigation-home {
+    left: 0%;
+}
+
+#artmaps-navigation-map {
+    left: 33%;
+}
+
+#artmaps-navigation-loginout {
+    left: 66%;
+    width: 34%;
+}
+
+.artmaps-navigation-link a {
+    color: #fff;
+    text-decoration: none;
+    width: 0px;
+    display: block;
+    margin: 0 auto;
+    overflow: hidden;
+    padding-left: 40px;
+}
+
+#artmaps-navigation-home a {
+    background: #444 url('../content/icons.png') no-repeat 0px 0;
+}
+
+#artmaps-navigation-map a {
+    background: #444 url('../content/icons.png') no-repeat -40px 0;
+}
+
+#artmaps-navigation-loginout a {
+    background: #444 url('../content/icons.png') no-repeat -120px 0;
+}

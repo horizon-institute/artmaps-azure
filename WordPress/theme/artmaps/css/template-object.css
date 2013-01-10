@@ -1,0 +1,265 @@
+@CHARSET "UTF-8";
+body {font-family: TateNewRegular, arial, sans-serif;}
+
+.artmaps-navigation-link {
+    position:absolute;;
+    width: 120px;;
+    height: 40px;
+    color: #fff;
+    z-index: 10;
+     top:80px;
+}
+
+#artmaps-navigation-home {
+    left: 20px;
+}
+
+#artmaps-navigation-map {
+    left: 140px;
+}
+
+#artmaps-navigation-loginout {
+    left: 260px;
+}
+
+.artmaps-navigation-link a
+    {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    margin: 0 auto;
+    padding-left: 120px;
+    overflow:hidden;
+    font-family: TateNewRegular, arial, sans-serif;
+    font-size:14px;
+    text-transform:uppercase;
+    height:20px;
+   
+    
+}
+
+.artmaps-navigation-link a:hover {cursor:pointer;}
+
+
+#artmaps-navigation-home a {
+    background:url('../content/icons-v2.png') no-repeat 0px 0;
+}
+
+#artmaps-navigation-map a {
+    background:url('../content/icons-v2.png') no-repeat 0 -20px ;
+}
+
+#artmaps-navigation-loginout a {
+    background:url('../content/icons-v2.png') no-repeat 0 -60px;
+}
+
+#artmaps-navigation-loginout .artmaps-navigation-logout a {
+    background:url('../content/icons-v2.png') no-repeat 0 -100px;
+}
+
+#artmaps-mapcontainer {
+    height: 400px;
+    margin: 10px;
+    clear: both;
+}
+
+.artmaps-map-key {
+    padding: 0 20px;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+.artmaps-map-key span {
+    padding-right: 10px;
+    background: #f5f4f0;
+    margin-right: 5px;
+    display: block;
+    float: left;
+    border: 1px solid  #aaa !important;
+}
+
+#artmaps-objectcontainer,
+#artmaps-commentcontainer,
+#artmaps-map-dialogcontainer {
+    float: left;
+    font-size: 14px;
+    width: 50%;
+}
+#artmaps-objectcontainer,
+#artmaps-map-dialogcontainer {width:50%!important; margin-bottom:20px; min-width:320px;} 
+.ui-resizable #artmaps-map-dialogcontainer {width: 100%!important;
+padding: 0;
+margin: 0;
+overflow: hidden;
+}
+.ui-resizable #artmaps-mapcontainer {height:80%;}
+#artmaps-objectcontainer div {padding:10px;}
+.ui-widget-overlay {background:#000; opacity:0.9;}
+#artmaps-commentcontainer {float:none; padding:20px; width:auto; clear:both; border-top:5px #1f1f1f solid; margin-top:20px; }
+.ui-resizable .ui-dialog-titlebar {width:100%;}
+.ui-resizable {border:none; }
+.artmaps-large-image-popup {text-align:center;}
+.artmaps-large-image-popup  img {max-width:95%; height:auto!important; padding:10px;}
+#artmaps-objectcontainer img {
+    float: left;
+    padding-bottom:10px;
+    min-width: 280px;
+    max-width: 100%;
+    max-height:400px;
+    display: block;
+}
+
+#artmaps-objectcontainer p {
+    padding: 0 10px;
+    clear:both;
+    display:block;
+    margin-bottom:0;
+}
+
+#artmaps-commentcontainer {
+    clear: both;
+    display: block;
+    padding: 20px 0;
+    font-size: 12px;
+    border-bottom: 1px solid #1f1f1f;
+    margin-top:20px;
+}
+
+#artmaps-actionscontainer {
+    text-align: center;
+    padding: 20px 20px 0px 20px;
+    position: relative;
+}
+
+.artmaps-mapview-link-button,
+.artmaps-action-comment-button,
+.artmaps-action-suggest-button,
+.artmaps-action-confirm-button,
+.artmaps-action-suggest-confirm-button,
+.artmaps-action-suggest-cancel-button,
+.artmaps-action-comment-popup-buttons div,
+.artmaps-action-comment-popup-buttons a,
+.artmaps-action-comment-popup-buttons img {
+    -webkit-appearance: none;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+    background-clip: padding-box;
+    border-radius: 0;
+    border: none!important;
+    cursor: pointer;
+    color: #fff;
+    outline: 0;
+    overflow: visible;
+    text-shadow: none;
+    width: auto;
+    margin: 0 5px;
+    font-size: 14px;
+    padding: 5px 20px!important;
+    font-weight: normal;
+    display: block;
+    float: left;
+    margin: 2px;
+    text-transform:uppercase;
+}
+
+
+.artmaps-mapview-link-button:hover,
+.artmaps-action-comment-button:hover,
+.artmaps-action-suggest-button:hover,
+.artmaps-action-confirm-button:hover,
+.artmaps-action-suggest-confirm-button:hover,
+.artmaps-action-suggest-cancel-button:hover,
+.artmaps-action-comment-popup-buttons div:hover,
+.artmaps-action-comment-popup-buttons a:hover {
+    text-decoration: underline;
+}
+
+.artmaps-mapview-link-button,
+.artmaps-action-comment-button,
+.artmaps-action-suggest-confirm-button,
+.artmaps-action-suggest-cancel-button,
+.artmaps-action-comment-popup-buttons div,
+.artmaps-action-comment-popup-buttons a {
+    background: #1f1f1f;
+}
+
+.artmaps-action-comment-button {margin:0 20px;  background: #ff0093;}
+.artmaps-action-suggest-confirm-button {background:#ff0093;}
+
+.artmaps-action-suggest-button {
+    background: #ff0093;
+    padding:5px 20px;
+    display:block;
+}
+
+.artmaps-action-confirm-button {
+    background: #2eb135;
+}
+
+.artmaps-mapview-menu {
+    background-color: #fff;
+    list-style-type: none;
+    line-height: 21px;
+    padding: 0;
+    width: 200px;
+    position: absolute;
+    z-index: 9999999;
+    top: 45px;
+    left: -16px;
+}
+
+.artmaps-mapview-menu li {
+    background: #fff;
+    padding: 5px 20px;
+    color: #444;
+    text-align: left;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+.artmaps-mapview-menu li:last-child {
+    border: none;
+}
+
+.artmaps-mapview-menu li input[type=radio] {
+    margin: 0 10px 0 0;
+    line-height: 21px;
+}
+
+.artmaps-mapview-menu li label {
+    display: block;
+}
+
+.artmaps-action-comment-popup {
+
+    font-size: 12px;
+}
+
+.artmaps-action-comment-popup-body {
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #000000;
+}
+
+.artmaps-action-comment-popup-body a {
+    text-decoration: underline;
+}
+
+.artmaps-action-comment-popup-body a:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+.ui-dialog-content {
+    padding-top: 0px !important;
+}
+
+.ui-dialog-titlebar {
+    height: 20px !important;
+}
+
+.artmaps-action-comment-popup {width:50%!important; min-width:300px; margin-top:-150px!important; font-family:TateNewRegular, arial, sans-serif; font-size:14px;}
+.artmaps-action-comment-popup textarea {min-height:200px; font-family:TateNewRegular, arial, sans-serif; font-size:14px;}
+
+#artmaps-objectcontainer img {cursor:pointer;}
