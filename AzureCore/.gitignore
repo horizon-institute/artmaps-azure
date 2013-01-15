@@ -1,9 +1,4 @@
-*.sln
-*.suo
-*.ccproj
 *.ccproj.user
-*.fsproj
-*.csproj
 *.csproj.user
 bin
 csx
