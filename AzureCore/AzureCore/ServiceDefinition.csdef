@@ -14,8 +14,6 @@
     <Imports>
       <Import moduleName="Diagnostics" />
       <Import moduleName="Caching" />
-      <Import moduleName="RemoteAccess" />
-      <Import moduleName="RemoteForwarder" />
     </Imports>
     <ConfigurationSettings>
       <Setting name="ArtMaps.DevFabric.Tracing.Path" />
