@@ -42,9 +42,7 @@ module Filters =
     let ArtMapsFilterRegex = new Regex(ArtMapsFilterRegexString)
     [<FilterUriMatch(ArtMapsFilterRegexString)>]
     let ArtMapsFilter (context : CTX.t) (uri : string) =
-        ArtMaps.Utilities.Log.information (ArtMapsFilterRegex.Match(uri).Groups.[1].Value)
-        let id = Convert.ToInt64(ArtMapsFilterRegex.Match(uri).Groups.[1].Value)
-        let o = context.dataContext.ObjectOfInterests.Single(fun (o : ObjectOfInterest) -> o.ID = id)
+        let o = context.dataContext.ObjectOfInterests.Single(fun (o : ObjectOfInterest) -> o.URI = uri)
         let conv (om : ObjectMetadata) =
             {
                 t.ID = om.ID
