@@ -62,15 +62,15 @@ module Configuration =
                 )
 
     let initDiagnostics () =
-        
+
         let diaConf = CacheDiagnostics.ConfigureDiagnostics(
-                            DiagnosticMonitor.GetDefaultInitialConfiguration())
-    
+                        DiagnosticMonitor.GetDefaultInitialConfiguration())
+        
+        diaConf.OverallQuotaInMB <- value("ArtMaps.Diagnostics.OverallBufferQuota")
+
         let logLevel = Enum.Parse(typeof<LogLevel>, value("ArtMaps.Diagnostics.LogLevel"), true) :?> LogLevel
         let transferPeriod = TimeSpan.FromMinutes(value("ArtMaps.Diagnostics.TransferPeriod"))
         let bufferQuota = value("ArtMaps.Diagnostics.BufferQuota")
-
-        diaConf.OverallQuotaInMB <- 20000
 
         diaConf.Logs.ScheduledTransferPeriod <- transferPeriod
         diaConf.Logs.BufferQuotaInMB <- bufferQuota
@@ -79,14 +79,18 @@ module Configuration =
         diaConf.Directories.ScheduledTransferPeriod <- transferPeriod
         diaConf.Directories.BufferQuotaInMB <- bufferQuota
         
-        diaConf.DiagnosticInfrastructureLogs.ScheduledTransferPeriod <- transferPeriod
+        (*diaConf.DiagnosticInfrastructureLogs.ScheduledTransferPeriod <- transferPeriod
         diaConf.DiagnosticInfrastructureLogs.BufferQuotaInMB <- bufferQuota
-        diaConf.DiagnosticInfrastructureLogs.ScheduledTransferLogLevelFilter <- logLevel
+        diaConf.DiagnosticInfrastructureLogs.ScheduledTransferLogLevelFilter <- logLevel*)
 
         diaConf.WindowsEventLog.ScheduledTransferPeriod <- transferPeriod
         diaConf.WindowsEventLog.BufferQuotaInMB <- bufferQuota
         diaConf.WindowsEventLog.ScheduledTransferLogLevelFilter <- logLevel
-        
+
+        diaConf.PerformanceCounters.ScheduledTransferPeriod <- transferPeriod
+        diaConf.PerformanceCounters.BufferQuotaInMB <- bufferQuota
+        diaConf.PerformanceCounters.DataSources.Clear()
+
         DiagnosticMonitor.Start("Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString", diaConf) |> ignore
 
     let initStorage () =

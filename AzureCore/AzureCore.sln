@@ -15,6 +15,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Utilities", "Utilities\Util
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Controllers", "Controllers\Controllers.fsproj", "{B7D1DC0F-5041-465C-8EA9-4515DD14ACD0}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Import", "Import\Import.fsproj", "{F613464A-F35E-43D1-ABA9-0EFFF27C27D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{B7D1DC0F-5041-465C-8EA9-4515DD14ACD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7D1DC0F-5041-465C-8EA9-4515DD14ACD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7D1DC0F-5041-465C-8EA9-4515DD14ACD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F613464A-F35E-43D1-ABA9-0EFFF27C27D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F613464A-F35E-43D1-ABA9-0EFFF27C27D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F613464A-F35E-43D1-ABA9-0EFFF27C27D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F613464A-F35E-43D1-ABA9-0EFFF27C27D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

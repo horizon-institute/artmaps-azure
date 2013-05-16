@@ -28,9 +28,10 @@ let verify (key : byte[]) (data : byte[]) (signature : obj) =
         | :? (byte[]) as sign -> rsa.VerifyData(data, sha, sign)
         | _ -> raise (new NotSupportedException("Unknown signature type"))
 
-let forAdmin (key : byte[]) (ctx : ModelDataContext) = 
+let forAdmin (key : byte[]) (ctx : ModelDataContext) (emulated : bool) = 
     ctx.Connection.Open()
-    ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
+    if not emulated then
+        ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
     { 
         ID = int64 -1
         t.name = null
@@ -39,13 +40,15 @@ let forAdmin (key : byte[]) (ctx : ModelDataContext) =
         getNextID = (fun o -> ctx.GetNextID(o))
     }
 
-let forService (name : string) (ctx : ModelDataContext) = 
+let forService (name : string) (ctx : ModelDataContext) (emulated : bool) = 
     ctx.Connection.Open()
-    ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
+    if not emulated then
+        ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
     match ctx.Contexts.SingleOrDefault(fun (c : Context) -> c.Name = name) with
         | null ->  None
         | _ as c ->
-            ctx.ExecuteCommand(sprintf "USE FEDERATION ContextFederation(ContextID=%i) WITH RESET, FILTERING=ON" c.ID, [||]) |> ignore
+            if not emulated then
+                ctx.ExecuteCommand(sprintf "USE FEDERATION ContextFederation(ContextID=%i) WITH RESET, FILTERING=ON" c.ID, [||]) |> ignore
             Some({ 
                     t.ID = c.ID
                     name = name
@@ -53,10 +56,12 @@ let forService (name : string) (ctx : ModelDataContext) =
                     verifySignature = verify (c.Key.ToArray())
                     getNextID = 
                         (fun o -> 
-                            ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
+                            if not emulated then
+                                ctx.ExecuteCommand("USE FEDERATION ContextFederation(ContextID=0) WITH RESET, FILTERING=OFF", [||]) |> ignore
                             try
                                 ctx.GetNextID(o)
                             finally
-                                ctx.ExecuteCommand(sprintf "USE FEDERATION ContextFederation(ContextID=%i) WITH RESET, FILTERING=ON" c.ID, [||]) |> ignore
+                                if not emulated then
+                                    ctx.ExecuteCommand(sprintf "USE FEDERATION ContextFederation(ContextID=%i) WITH RESET, FILTERING=ON" c.ID, [||]) |> ignore
                         )
             })

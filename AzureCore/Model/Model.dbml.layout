@@ -72,7 +72,7 @@
         <classShapeMoniker Id="2611b51d-5c3d-4694-9169-4f82c96a9f30" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(2.75 : 4.69314697265625); (4.5 : 4.69314697265625); (4.5 : 6.625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(2.75 : 4.69314697265625); (3.04166666666667 : 4.69314697265625 : JumpStart); (3.20833333333333 : 4.69314697265625 : JumpEnd); (4.5 : 4.69314697265625); (4.5 : 6.625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/ModelDataContext/User/User_Action" />
       <nodes>
         <classShapeMoniker Id="7421f65e-14f4-4262-b9f0-9f3a108600a5" />
@@ -195,7 +195,7 @@
         <classShapeMoniker Id="acdf7671-cc23-4c3a-b121-939901fee7a2" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(5.5 : 10.3594201074219); (13.125 : 10.3594201074219); (13.125 : 9.70359537760417)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(5.5 : 10.3594201074219); (10.1666666666667 : 10.3594201074219 : JumpStart); (10.3333333333333 : 10.3594201074219 : JumpEnd); (13.125 : 10.3594201074219); (13.125 : 9.70359537760417)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/ModelDataContext/Location/Location_PingbackLocation" />
       <nodes>
         <classShapeMoniker Id="2611b51d-5c3d-4694-9169-4f82c96a9f30" />
@@ -230,12 +230,18 @@
         <classShapeMoniker Id="fb6198b3-97f6-4735-92d4-4e8693b05943" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(2.75 : 4.47157348632812); (15.125 : 4.47157348632812)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(2.75 : 4.47157348632812); (3.04166666666667 : 4.47157348632812 : JumpStart); (3.20833333333333 : 4.47157348632812 : JumpEnd); (10.2916666666667 : 4.47157348632812 : JumpStart); (10.4583333333333 : 4.47157348632812 : JumpEnd); (15.125 : 4.47157348632812)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/ModelDataContext/User/User_PingbackUser" />
       <nodes>
         <classShapeMoniker Id="7421f65e-14f4-4262-b9f0-9f3a108600a5" />
         <classShapeMoniker Id="fb6198b3-97f6-4735-92d4-4e8693b05943" />
       </nodes>
     </associationConnector>
+    <classShape Id="162fa066-43a3-4f23-9da8-1e1a5941d3bb" absoluteBounds="4, 0.75, 2, 1.1939925130208333">
+      <DataClassMoniker Name="/ModelDataContext/Sequence" />
+      <nestedChildShapes>
+        <elementListCompartment Id="73450fc9-384e-4ff8-a927-720fc36bbf1b" absoluteBounds="4.015, 1.21, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

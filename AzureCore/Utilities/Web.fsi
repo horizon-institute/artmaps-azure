@@ -76,3 +76,8 @@ type CacheHeaderFilter =
     inherit System.Web.Http.Filters.ActionFilterAttribute
     new : int64 -> CacheHeaderFilter    
     new : int * int * int * int -> CacheHeaderFilter
+
+/// Filter that closes the Context (inc. DB connections).
+type ContextClosingFilter =
+    inherit System.Web.Http.Filters.ActionFilterAttribute
+    new : unit -> ContextClosingFilter

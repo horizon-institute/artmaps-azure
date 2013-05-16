@@ -88,6 +88,7 @@ type ObjectsOfInterestV1Controller() =
 
         let o = new ObjectOfInterest()
         o.ID <- context.getNextID(o :> obj)
+        o.ContextID <- context.ID
         o.URI <- interest.URI
         context.dataContext.ObjectOfInterests.InsertOnSubmit(o)
         context.dataContext.SubmitChanges()
@@ -157,6 +158,7 @@ type ActionsV1Controller() =
                     | null -> 
                         let u = new User()
                         u.ID <- context.getNextID(u :> obj)
+                        u.ContextID <- context.ID
                         u.URI <- userURI
                         context.dataContext.Users.InsertOnSubmit(u)
                         context.dataContext.SubmitChanges()
@@ -165,6 +167,7 @@ type ActionsV1Controller() =
 
         let a = new Action()
         a.ID <- context.getNextID(a :> obj)
+        a.ContextID <- context.ID
         a.ObjectOfInterest <- o
         a.User <- u
         a.URI <- action.URI
@@ -182,6 +185,7 @@ type ActionsV1Controller() =
                     let l = context.dataContext.Locations.SingleOrDefault(fun (l : Location) -> l.ID = lid)
                     let al = new ActionLocation()
                     al.ID <- context.getNextID(a :> obj)
+                    al.ContextID <- context.ID
                     al.Action <- a
                     al.Location <- l
                     context.dataContext.ActionLocations.InsertOnSubmit(al)
@@ -263,6 +267,7 @@ type LocationsV1Controller() =
                     | null -> 
                         let u = new User()
                         u.ID <- context.getNextID(u :> obj)
+                        u.ContextID <- context.ID
                         u.URI <- userURI
                         context.dataContext.Users.InsertOnSubmit(u)
                         context.dataContext.SubmitChanges()
@@ -271,11 +276,13 @@ type LocationsV1Controller() =
         
         let p = new LocationPoint()
         p.ID <- context.getNextID(p :> obj)
+        p.ContextID <- context.ID
         p.Error <- location.error
         p.Center <- SqlGeography.Point(Conv.ToFloatCoord location.latitude, Conv.ToFloatCoord location.longitude, Conv.SRID)
         context.dataContext.LocationPoints.InsertOnSubmit(p)
         let l = new Location()
         l.ID <- context.getNextID(l :> obj)
+        l.ContextID <- context.ID
         l.LocationSource <- LocationSource.User
         l.ObjectOfInterest <- o
         l.LocationPoints.Add(p)
@@ -298,6 +305,7 @@ type MetadataV1Controller() =
     [<HttpGet>]
     [<ActionName("Default")>]
     [<WU.CacheHeaderFilter(365, 0, 0, 0)>] 
+    [<WU.ContextClosingFilter()>]
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 oID : int64) =

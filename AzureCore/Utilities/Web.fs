@@ -4,6 +4,7 @@ module ArtMaps.Utilities.Web
   
 open ArtMaps.Persistence.Context
 open Microsoft.FSharp.Reflection
+open Microsoft.WindowsAzure.ServiceRuntime
 open Newtonsoft.Json
 open System
 open System.Collections.Generic
@@ -130,10 +131,10 @@ type ContextBinder() =
                     AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
         bindingContext.Model <- 
             if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
-                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
+                CTX.forAdmin AU.Resources.MasterKey ctx RoleEnvironment.IsEmulated :> obj
             else
                 let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
-                match CTX.forService name ctx with
+                match CTX.forService name ctx RoleEnvironment.IsEmulated with
                     | Some(c) -> c :> obj
                     | None -> null
         actionContext.Request.Properties.Add("context", bindingContext.Model)
@@ -146,10 +147,10 @@ type MvcContextBinder() =
             let ctx = new ModelDataContext(
                         AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
             if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
-                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
+                CTX.forAdmin AU.Resources.MasterKey ctx RoleEnvironment.IsEmulated :> obj
             else
                 let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
-                match CTX.forService name ctx with
+                match CTX.forService name ctx RoleEnvironment.IsEmulated with
                     | Some(c) -> c :> obj
                     | None -> null
 
@@ -229,3 +230,12 @@ type CacheHeaderFilter(seconds : int64) =
             ctx.Response.Headers.CacheControl <- h
         with _ as e ->
             sprintf "Unable to set cache response header: %s\n%s" e.Message e.StackTrace |> Log.warning
+
+type ContextClosingFilter() =
+    inherit ActionFilterAttribute()
+    override this.OnActionExecuted(ctx) =
+        try 
+            let c = ctx.ActionContext.ActionArguments.["context"] :?> CTX.t
+            c.dataContext.Dispose()
+        with _ as e -> 
+            sprintf "%s: %s" e.Message e.StackTrace |> Log.error

@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Database Name="artmapsdev" EntityNamespace="ArtMaps.Persistence.Entities" ContextNamespace="ArtMaps.Persistence.Context" Class="ModelDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="artmapsdev" EntityNamespace="ArtMaps.Persistence.Entities" ContextNamespace="ArtMaps.Persistence.Context" Class="ModelDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Table Name="dbo.Action" Member="Actions">
     <Type Name="Action">
       <Column Name="ID" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -178,6 +177,12 @@
       <Column Name="UserID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Association Name="Pingback_PingbackUser" Member="Pingback" ThisKey="PingbackID,ContextID" OtherKey="ID,ContextID" Type="Pingback" IsForeignKey="true" />
       <Association Name="User_PingbackUser" Member="User" ThisKey="UserID,ContextID" OtherKey="ID,ContextID" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sequence" Member="Sequences">
+    <Type Name="Sequence">
+      <Column Name="TableName" Type="System.String" DbType="nchar(20) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="CurrentID" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
   <Function Name="dbo.NextID" Method="NextID">

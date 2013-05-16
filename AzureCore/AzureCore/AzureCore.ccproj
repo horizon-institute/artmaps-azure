@@ -33,10 +33,19 @@
   <!-- Items for the project -->
   <ItemGroup>
     <ServiceDefinition Include="ServiceDefinition.csdef" />
+    <ServiceConfiguration Include="ServiceConfiguration.Development.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Import\Import.fsproj">
+      <Name>Import</Name>
+      <Project>{f613464a-f35e-43d1-aba9-0efff27c27d4}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>Import</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\UI\UI.csproj">
       <Name>UI</Name>
       <Project>{ed13e075-76dc-48e7-b22f-a164f5d89d9f}</Project>
@@ -61,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <PublishProfile Include="Profiles\artmapsv2Production.azurePubxml" />
+    <PublishProfile Include="Profiles\artmapsv2Staging.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
