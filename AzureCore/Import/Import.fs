@@ -8,7 +8,7 @@ open DataAccess
 open Microsoft.SqlServer.Types
 open Microsoft.WindowsAzure
 open Microsoft.WindowsAzure.ServiceRuntime
-open Microsoft.WindowsAzure.StorageClient
+open Microsoft.WindowsAzure.Storage
 open System
 open System.Linq
 
@@ -17,9 +17,9 @@ module Ctx = ArtMaps.Context
 module Log = ArtMaps.Utilities.Log
 
 type t = {
-    queue : CloudQueue
-    container : CloudBlobContainer
-    item : CloudQueueMessage option
+    queue : Queue.CloudQueue
+    container : Blob.CloudBlobContainer
+    item : Queue.CloudQueueMessage option
 }
 
 
@@ -124,6 +124,3 @@ let import (current : t) =
                 blob.DeleteIfExists() |> ignore
                 mdx.Dispose()
                 // report error
-            
-
-              

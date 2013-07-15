@@ -4,7 +4,7 @@ namespace ArtMaps.Import
 
 open Microsoft.WindowsAzure
 open Microsoft.WindowsAzure.ServiceRuntime
-open Microsoft.WindowsAzure.StorageClient
+open Microsoft.WindowsAzure.Storage
 open System
 open System.Net
 open System.Threading

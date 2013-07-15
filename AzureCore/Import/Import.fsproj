@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>f613464a-f35e-43d1-aba9-0efff27c27d4</ProjectGuid>
+    <ProjectGuid>73dcf61c-dd2c-4ffd-8df5-f072e6d12b3e</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Import</RootNamespace>
     <AssemblyName>Import</AssemblyName>
@@ -46,14 +46,22 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CsvReader">
-      <HintPath>..\packages\CsvTools.1.0.8\lib\CsvReader.dll</HintPath>
+      <HintPath>..\packages\CsvTools.1.0.9\lib\CsvReader.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Data.Edm">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData">
+      <HintPath>..\packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Types">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Microsoft SQL Server\110\Shared\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
@@ -64,36 +72,24 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Numerics" />
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>false</Private>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>true</Private>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>true</Private>
+    <Reference Include="System.Spatial">
+      <HintPath>..\packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzureUtilities\AzureUtilities.fsproj">
       <Name>AzureUtilities</Name>
-      <Project>{38cb8204-fe09-40bd-87a2-ea0ee02f625d}</Project>
+      <Project>{aed8d8b5-6ae6-4e27-bd0e-9665f7ac5920}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Core\Core.fsproj">
@@ -108,7 +104,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Utilities\Utilities.fsproj">
       <Name>Utilities</Name>
-      <Project>{94a537de-4715-4dcb-9517-e5c8b8ec9f9d}</Project>
+      <Project>{676a3300-a7e9-431e-b34e-c80262375f48}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
