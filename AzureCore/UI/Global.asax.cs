@@ -22,9 +22,7 @@ namespace ArtMaps.UI
             ArtMaps.Azure.Utilities.Configuration.initSettings();
             ArtMaps.Azure.Utilities.Configuration.initStorage();
 
-            var ss = GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings;
-            if (ss == null)
-                ss = new Newtonsoft.Json.JsonSerializerSettings();
+            var ss = new Newtonsoft.Json.JsonSerializerSettings();
             ss.Converters.Add(new ArtMaps.Controllers.Types.V1.JsonConverters.ActionConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.V1.JsonConverters.PointLocationConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.V1.JsonConverters.ObjectOfInterestConverter());

@@ -37,14 +37,6 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Import\Import.fsproj">
-      <Name>Import</Name>
-      <Project>{73dcf61c-dd2c-4ffd-8df5-f072e6d12b3e}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>Import</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
     <ProjectReference Include="..\UI\UI.csproj">
       <Name>UI</Name>
       <Project>{63414915-0376-404e-8a61-ce9e4e0140f9}</Project>
@@ -56,7 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ImportContent\" />
+    <Folder Include="Profiles" />
     <Folder Include="UIContent\" />
+    <Folder Include="UIContent\Keys" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ImportContent\diagnostics.wadcfg">
@@ -65,6 +59,15 @@
     <Content Include="UIContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="UIContent\Keys\MasterKey.blob">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="UIContent\Keys\MasterKey.pem">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishProfile Include="Profiles\artmapsdevProduction.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

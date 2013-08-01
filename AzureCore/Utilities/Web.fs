@@ -57,7 +57,7 @@ type JsonRecordConverter() =
                     | JsonToken.Boolean -> Convert.ToBoolean(reader.Value) :> obj
                     | JsonToken.Null -> null
                     | x -> 
-                        sprintf "Unable to process JsonType %s" (x.ToString()) |> Log.warning
+                        sprintf "Unable to process JsonType '%A'" x |> Log.warning
                         null
             values.Add(name, value)
 

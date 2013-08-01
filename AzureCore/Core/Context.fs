@@ -26,7 +26,7 @@ let verify (key : byte[]) (data : byte[]) (signature : obj) =
             let s = Convert.FromBase64String(sign)
             rsa.VerifyData(data, sha, s)
         | :? (byte[]) as sign -> rsa.VerifyData(data, sha, sign)
-        | _ -> raise (new NotSupportedException("Unknown signature type"))
+        | _ -> raise (new NotSupportedException(sprintf "Unknown signature type: %s" (signature.GetType().ToString())))
 
 let forAdmin (key : byte[]) (ctx : ModelDataContext) (emulated : bool) = 
     ctx.Connection.Open()
