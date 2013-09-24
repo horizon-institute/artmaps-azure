@@ -143,6 +143,7 @@ type ContextBinder() =
 type MvcContextBinder() =
     interface System.Web.Mvc.IModelBinder with
         member this.BindModel(controllerContext, bindingContext) =
+
             let cnt = controllerContext.Controller
             let ctx = new ModelDataContext(
                         AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
@@ -160,7 +161,6 @@ type ContextBinderProvider() =
         match modelType.IsAssignableFrom(typeof<CTX.t>) with
             | true -> new ContextBinder() :> IModelBinder
             | false -> null
-
 
 type ValidContextFilter() =
     inherit ActionFilterAttribute()

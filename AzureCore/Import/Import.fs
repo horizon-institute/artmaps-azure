@@ -11,6 +11,7 @@ open Microsoft.WindowsAzure.ServiceRuntime
 open Microsoft.WindowsAzure.Storage
 open System
 open System.Linq
+open System.Net
 
 module AU = ArtMaps.Azure.Utilities
 module Ctx = ArtMaps.Context
@@ -49,8 +50,14 @@ let init (storage : CloudStorageAccount) =
 
 let parseRow (ctx : Ctx.t) (number : int) (r : Row) = 
     sprintf "Importing row number %i" number |> Log.information
-    let lat = Convert.ToDouble(r.Values.[0])
-    let lng = Convert.ToDouble(r.Values.[1])
+    let lat = 
+        match String.IsNullOrWhiteSpace(r.Values.[0]) with
+            | true -> 0.0
+            | false -> Convert.ToDouble(r.Values.[0])
+    let lng = 
+        match String.IsNullOrWhiteSpace(r.Values.[1]) with
+            | true -> 0.0
+            | false -> Convert.ToDouble(r.Values.[1])
     let uri = sprintf "artmaps://%s" r.Values.[2]
 
     let o = 
@@ -92,6 +99,12 @@ let parseRow (ctx : Ctx.t) (number : int) (r : Row) =
             o.ObjectMetadatas.Add(md)
             ())
 
+let report (url : string) (success : bool) =
+    try
+        let req = WebRequest.Create(url)
+        req.Headers.Add("success", if success then "true" else "false")
+        req.GetResponse() |> ignore
+    with _ -> ()
 
 let import (current : t) =
     match current.item with
@@ -101,26 +114,29 @@ let import (current : t) =
             let mdx = new ModelDataContext(
                         AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
             let blob = current.container.GetBlockBlobReference(msg.AsString)
+            blob.FetchAttributes()
+            let cbUrl = blob.Metadata.["Callback"]
             try
                 blob.FetchAttributes()
                 let ctx = Ctx.forService blob.Metadata.["ContextName"] mdx RoleEnvironment.IsEmulated
+                
                 match ctx with
                     | None -> 
                         current.queue.DeleteMessage(msg)
                         blob.DeleteIfExists() |> ignore
                         mdx.Dispose()
-                        // Report error
+                        report cbUrl false
                     | Some(c) ->
-                        let table = DataTable.New.Read(new IO.StreamReader(blob.OpenRead(), Text.Encoding.UTF8))
+                        let table = DataTable.New.ReadLazy(blob.OpenRead())
                         table.Rows |> Seq.iteri (parseRow c)
                         mdx.SubmitChanges()
                         current.queue.DeleteMessage(msg)
                         blob.DeleteIfExists() |> ignore
                         mdx.Dispose()
-                        // report success
+                        report cbUrl true
             with e ->
                 sprintf "%s:\n%s" e.Message e.StackTrace |> Log.error
                 current.queue.DeleteMessage(msg)
                 blob.DeleteIfExists() |> ignore
                 mdx.Dispose()
-                // report error
+                report cbUrl false
