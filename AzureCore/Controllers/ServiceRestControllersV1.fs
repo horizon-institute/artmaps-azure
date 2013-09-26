@@ -43,6 +43,11 @@ type ObjectsOfInterestV1Controller() =
             |> Seq.map Conv.InBoundsResultToObjectRecord
 
     [<HttpOptions>]
+    [<ActionName("Search")>] 
+    [<WU.CacheHeaderFilter(0, 1, 0, 0)>] 
+    member this.Search() = ()
+
+    [<HttpOptions>]
     [<ActionName("Default")>]
     [<WU.CacheHeaderFilter(365, 0, 0, 0)>] 
     member this.Options() = ()
