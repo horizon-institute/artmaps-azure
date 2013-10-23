@@ -1,4 +1,1 @@
-artmaps
-=======
-
-Code and documentation for the ArtMaps project
+**ArtMaps Azure Cloud Service and Utilities**
