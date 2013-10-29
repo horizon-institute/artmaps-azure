@@ -130,6 +130,7 @@ let import (current : t) =
                         let table = DataTable.New.ReadLazy(blob.OpenRead())
                         table.Rows |> Seq.iteri (parseRow c)
                         mdx.SubmitChanges()
+                        sprintf "Finished import, reporting to '%s'" cbUrl |> Log.information
                         current.queue.DeleteMessage(msg)
                         blob.DeleteIfExists() |> ignore
                         mdx.Dispose()

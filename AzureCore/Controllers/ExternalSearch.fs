@@ -80,7 +80,7 @@ module Searches =
                 |> List.ofSeq |> Seq.ofList
 
         try
-            let min = ((pageno - 1) * 3) + 1
+            let min = Math.Max(1, (((pageno - 1) * 3) + 1))
             let max = min + 2
             sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.information
             seq { min..max } 
@@ -146,7 +146,7 @@ module Searches =
                 ) |> List.ofSeq |> Seq.ofList
 
         try
-            let min = ((pageno - 1) * 3) + 1
+            let min = Math.Max(1, (((pageno - 1) * 3) + 1))
             let max = min + 2
             sprintf "Page count for search '%s': %i -> %i" uri min max |> Log.information
             seq { min..max } 

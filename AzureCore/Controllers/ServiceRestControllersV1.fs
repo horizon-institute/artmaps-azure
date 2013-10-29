@@ -386,7 +386,7 @@ type ExternalSearchV1Controller() =
         // be used to prevent collisions between searches
         let pageno = 
             match p.HasValue with
-                | true -> p.Value
+                | true -> if p.Value < 1 then 1 else p.Value
                 | false -> 1
         let region = sprintf "%s%i" (RegularExpressions.Regex.Replace(s, @"[^a-zA-Z0-9]", "")) pageno
         cache.CreateRegion(region) |> ignore
