@@ -62,6 +62,11 @@ namespace ArtMaps.UI
                 defaults: new { controller = "ObjectsOfInterestV1", action = "Search" }
             ));
             rts.Add(routes.MapHttpRoute(
+                name: "ObjectsOfInterestSearchByUriV1",
+                routeTemplate: "service/{context}/rest/v1/objectsofinterest/searchbyuri",
+                defaults: new { controller = "ObjectsOfInterestV1", action = "SearchByURI" }
+            ));
+            rts.Add(routes.MapHttpRoute(
                 name: "ObjectsOfInterestDefaultV1",
                 routeTemplate: "service/{context}/rest/v1/objectsofinterest/{ID}",
                 defaults: new { controller = "ObjectsOfInterestV1", action = "Default", ID = RouteParameter.Optional }

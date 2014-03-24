@@ -68,6 +68,21 @@ type ObjectsOfInterestV1Controller() =
             raise (Er.NotFound(Er.NotFoundMinorCode.Unspecified))
         o |> Conv.ObjectToObjectRecord
 
+    [<HttpOptions>]
+    [<ActionName("SearchByURI")>] 
+    [<WU.CacheHeaderFilter(0, 1, 0, 0)>] 
+    member this.SearchByURI() = ()
+
+    [<HttpGet>]
+    [<ActionName("SearchByURI")>]
+    member this.SearchByURI
+            ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
+                [<FromUri>]qp : Types.V1.OoIURIQueryParameters) =
+        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.URI = qp.URI))
+        if o = null then 
+            raise (Er.NotFound(Er.NotFoundMinorCode.Unspecified))
+        o |> Conv.ObjectToObjectRecord
+
     [<HttpPost>]
     [<ActionName("Default")>]
     member this.Post

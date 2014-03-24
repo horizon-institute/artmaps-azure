@@ -28,6 +28,11 @@ type UserQueryParameters = {
     URI : string
 }
 
+[<ModelBinder(typeof<WU.RecordBinderProvider>)>]
+type OoIURIQueryParameters = {
+    URI : string
+}
+
 type Action = {
     ID : int64
     URI : string
