@@ -75,8 +75,16 @@ module Filters =
 
         let metadata =
             try
-                let imageurl = (IMAGE_URL (root.SelectNodes("//div[@class='image_box']//img").[0].Attributes.["src"].Value))
-                [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
+                let arr = root.SelectNodes("//div[@class='image_box']//img")
+                let rec loop (i : int) =
+                    try
+                        let imageurl = (IMAGE_URL (arr.[i].Attributes.["src"].Value))
+                        [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
+                    with _ -> 
+                        match i + 1 with
+                        | i when i = arr.Count -> List.empty<t>
+                        | i -> loop i
+                loop 0
             with _ -> List.empty<t>
 
         let paths = [
