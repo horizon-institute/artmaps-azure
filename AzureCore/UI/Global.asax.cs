@@ -32,6 +32,7 @@ namespace ArtMaps.UI
             ss.Converters.Add(new ArtMaps.Controllers.Types.V2.Out.Conversions.JsonConverters.ActionConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.V2.Out.Conversions.JsonConverters.LocationConverter());
             ss.Converters.Add(new ArtMaps.Controllers.Types.V2.Out.Conversions.JsonConverters.ObjectOfInterestConverter());
+            ss.Converters.Add(new ArtMaps.Controllers.Types.V1.JsonConverters.ObjectOfInterestSearchConverter());
             ss.Converters.Add(new ArtMaps.Utilities.Web.JsonRecordConverter());
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings = ss;
 

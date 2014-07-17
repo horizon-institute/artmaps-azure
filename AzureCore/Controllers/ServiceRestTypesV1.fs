@@ -67,6 +67,18 @@ type ObjectOfInterest = {
     signature : string
 }
 
+type ObjectOfInterestSearch = {
+    ID : int64
+    URI : string
+    locations : PointLocation seq
+    actions : Action seq
+    metadata : (string * string) seq
+    username : string
+    userLevel : string
+    timestamp : int64
+    signature : string
+}
+
 type User = {
     ID : int64
     URI : string
@@ -173,6 +185,49 @@ module JsonConverters =
                 
             writer.WriteEndObject()
 
+    type ObjectOfInterestSearchConverter() =
+        inherit Newtonsoft.Json.JsonConverter()
+
+        static let acConv = new ActionConverter()
+        static let plConv = new PointLocationConverter()
+    
+        override this.CanRead with get () = false
+        override this.CanWrite with get () = true
+        override this.CanConvert(t) = t = typeof<ObjectOfInterestSearch>
+
+        override this.ReadJson(reader, t, ob, serializer) =
+            raise (new System.NotImplementedException())
+
+        override this.WriteJson(writer, ob, serializer) = 
+
+            let o = ob :?> ObjectOfInterestSearch
+            writer.WriteStartObject()
+                
+            writer.WritePropertyName("ID")
+            writer.WriteValue(o.ID)
+
+            writer.WritePropertyName("URI")
+            writer.WriteValue(o.URI)
+
+            writer.WritePropertyName("locations")
+            writer.WriteStartArray()
+            o.locations |> Seq.iter (fun l -> plConv.WriteJson(writer, l, serializer))
+            writer.WriteEndArray()
+
+            writer.WritePropertyName("actions")
+            writer.WriteStartArray()
+            o.actions |> Seq.iter (fun a -> acConv.WriteJson(writer, a, serializer))
+            writer.WriteEndArray()
+
+            writer.WritePropertyName("metadata")
+            writer.WriteStartObject()
+            o.metadata |> Seq.iter(fun (k, v) ->
+                                                writer.WritePropertyName(k)
+                                                writer.WriteValue(v))
+            writer.WriteEndObject()
+                
+            writer.WriteEndObject()
+
     type UserConverter() =
         inherit Newtonsoft.Json.JsonConverter()
     
@@ -267,10 +322,11 @@ module Conversions =
 
     let ObjectToObjectSearchRecord (o : Entities.ObjectOfInterest) =
         {
-            ObjectOfInterest.ID = o.ID
+            ObjectOfInterestSearch.ID = o.ID
             URI = o.URI
             locations = o.Locations |> Seq.choose LocationToLocationRecord |> List.ofSeq |> Seq.ofList
             actions = o.Actions |> Seq.map ActionToActionRecord |> List.ofSeq |> Seq.ofList
+            metadata = o.ObjectMetadatas |> Seq.map (fun md -> (md.Name, md.Value)) |> List.ofSeq |> Seq.ofList
             username = null
             userLevel = null
             timestamp = 0L

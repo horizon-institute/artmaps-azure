@@ -230,6 +230,17 @@ module Searches =
         with _ -> 
             Seq.empty
 
+    [<SearchUriMatch("^artmaps://.*$")>]
+    let ArtmapsSearch (uri : string, pageno : int32, ctx : CTX.t) =
+        let ref = uri.Substring(uri.LastIndexOf("/") + 1).Trim().ToLower()
+        let start = pageno * 10
+        let q = query { for md in ctx.dataContext.ObjectMetadatas do  
+                            if md.Value.ToLower().Contains(ref) then select md.ObjectOfInterest }
+        q |> Seq.skip start |> Seq.take 10 |> Seq.toList |> List.map (fun o -> 
+                                let o' = Conv.ObjectToObjectSearchRecord o
+                                o.Actions |> Seq.iter (fun i -> ())
+                                o') |> Seq.ofList
+
 
 open System
 open System.Collections.Generic
