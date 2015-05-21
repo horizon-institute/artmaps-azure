@@ -11,7 +11,6 @@ namespace UI
     {
         public override bool OnStart()
         {
-            ArtMaps.Azure.Utilities.Configuration.initDiagnostics();
             return base.OnStart();
         }
     }

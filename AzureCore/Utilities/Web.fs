@@ -131,10 +131,10 @@ type ContextBinder() =
                     AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
         bindingContext.Model <- 
             if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
-                CTX.forAdmin AU.Resources.MasterKey ctx RoleEnvironment.IsEmulated :> obj
+                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
             else
                 let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
-                match CTX.forService name ctx RoleEnvironment.IsEmulated with
+                match CTX.forService name ctx with
                     | Some(c) -> c :> obj
                     | None -> null
         actionContext.Request.Properties.Add("context", bindingContext.Model)
@@ -148,10 +148,10 @@ type MvcContextBinder() =
             let ctx = new ModelDataContext(
                         AU.Configuration.value<string>("ArtMaps.SqlServer.ConnectionString"))
             if cnt.GetType().GetCustomAttributes(typeof<AdminContextAttribute>, true).Any() then
-                CTX.forAdmin AU.Resources.MasterKey ctx RoleEnvironment.IsEmulated :> obj
+                CTX.forAdmin AU.Resources.MasterKey ctx :> obj
             else
                 let name = bindingContext.ValueProvider.GetValue("context").ConvertTo(typeof<string>) :?> string
-                match CTX.forService name ctx RoleEnvironment.IsEmulated with
+                match CTX.forService name ctx with
                     | Some(c) -> c :> obj
                     | None -> null
 

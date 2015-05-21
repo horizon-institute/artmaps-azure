@@ -1,60 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceDefinition name="AzureCore" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2013-03.2.0">
-  <WebRole name="UI" vmsize="Small">
-    <Sites>
-      <Site name="Web">
-        <Bindings>
-          <Binding name="HTTP" endpointName="HTTP" />
-        </Bindings>
-      </Site>
-    </Sites>
-    <Endpoints>
-      <InputEndpoint name="HTTP" protocol="http" port="80" />
-    </Endpoints>
-    <Imports>
-      <Import moduleName="Diagnostics" />
-      <Import moduleName="Caching" />
-    </Imports>
-    <LocalResources>
-      <LocalStorage name="DiagnosticStore" sizeInMB="40000" cleanOnRoleRecycle="false" />
-    </LocalResources>
-    <ConfigurationSettings>
-      <Setting name="ArtMaps.DevFabric.Tracing.Path" />
-      <Setting name="ArtMaps.Diagnostics.BufferQuota" />
-      <Setting name="ArtMaps.Diagnostics.LogLevel" />
-      <Setting name="ArtMaps.Diagnostics.OverallBufferQuota" />
-      <Setting name="ArtMaps.Diagnostics.TransferPeriod" />
-      <Setting name="ArtMaps.Security.KeySize" />
-      <Setting name="ArtMaps.SqlServer.ConnectionString" />
-      <Setting name="ArtMaps.Storage.ConnectionString" />
-      <Setting name="ArtMaps.Storage.Containers" />
-      <Setting name="ArtMaps.Storage.Queues" />
-      <Setting name="ArtMaps.Storage.Tables" />
-      <Setting name="Microsoft.WindowsAzure.Plugins.Caching.ClientDiagnosticLevel" />
-    </ConfigurationSettings>
-    <Startup priority="-2">
-      <Task commandLine="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe install" executionContext="elevated" taskType="simple" />
-    </Startup>
-  </WebRole>
-  <WorkerRole name="Import" vmsize="Small">
-    <Imports>
-      <Import moduleName="Diagnostics" />
-    </Imports>
-    <ConfigurationSettings>
-      <Setting name="ArtMaps.Storage.ConnectionString" />
-      <Setting name="ArtMaps.Storage.Containers" />
-      <Setting name="ArtMaps.Storage.Queues" />
-      <Setting name="ArtMaps.Storage.Tables" />
-      <Setting name="ArtMaps.SqlServer.ConnectionString" />
-      <Setting name="ArtMaps.DevFabric.Tracing.Path" />
-      <Setting name="ArtMaps.Diagnostics.BufferQuota" />
-      <Setting name="ArtMaps.Diagnostics.LogLevel" />
-      <Setting name="ArtMaps.Diagnostics.OverallBufferQuota" />
-      <Setting name="ArtMaps.Diagnostics.TransferPeriod" />
-      <Setting name="ArtMaps.Security.KeySize" />
-    </ConfigurationSettings>
-    <LocalResources>
-      <LocalStorage name="DiagnosticStore" cleanOnRoleRecycle="false" sizeInMB="40000" />
-    </LocalResources>
-  </WorkerRole>
+<?xml version="1.0"?>
+<ServiceDefinition name="AzureCore" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2015-04.2.6">
+    <WebRole name="UI" vmsize="Small">
+        <Sites>
+            <Site name="Web">
+                <Bindings>
+                    <Binding name="HTTP" endpointName="HTTP" />
+                </Bindings>
+            </Site>
+        </Sites>
+        <Endpoints>
+            <InputEndpoint name="HTTP" protocol="http" port="80" />
+        </Endpoints>
+        <Imports>
+            <Import moduleName="Caching" />
+        </Imports>
+        <LocalResources>
+            <LocalStorage name="DiagnosticStore" sizeInMB="20000" cleanOnRoleRecycle="false" />
+        </LocalResources>
+        <ConfigurationSettings>
+            <Setting name="ArtMaps.Security.KeySize" />
+            <Setting name="ArtMaps.SqlServer.ConnectionString" />
+            <Setting name="Microsoft.WindowsAzure.Plugins.Caching.ClientDiagnosticLevel" />
+        </ConfigurationSettings>
+        <Startup priority="-2">
+            <Task commandLine="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe install" executionContext="elevated" taskType="simple" />
+        </Startup>
+    </WebRole>
 </ServiceDefinition>

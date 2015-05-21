@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>2.0</ProductVersion>
+    <ProductVersion>2.6</ProductVersion>
     <ProjectGuid>28c2a102-6de3-476b-bc06-fd64fb3ff7b1</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -12,6 +12,8 @@
     <AssemblyName>AzureCore</AssemblyName>
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <Name>AzureCore</Name>
+    <UseEmulatorExpressByDefault>False</UseEmulatorExpressByDefault>
+    <UseWebProjectPorts>True</UseWebProjectPorts>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,19 +34,11 @@
   </PropertyGroup>
   <!-- Items for the project -->
   <ItemGroup>
+    <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
     <ServiceDefinition Include="ServiceDefinition.csdef" />
-    <ServiceConfiguration Include="ServiceConfiguration.Development.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Import\Import.fsproj">
-      <Name>Import</Name>
-      <Project>{73dcf61c-dd2c-4ffd-8df5-f072e6d12b3e}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>Import</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
     <ProjectReference Include="..\UI\UI.csproj">
       <Name>UI</Name>
       <Project>{63414915-0376-404e-8a61-ce9e4e0140f9}</Project>
@@ -61,12 +55,6 @@
     <Folder Include="UIContent\Keys" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ImportContent\diagnostics.wadcfg">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="UIContent\diagnostics.wadcfg">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="UIContent\Keys\MasterKey.blob">
       <SubType>Content</SubType>
     </Content>
@@ -75,13 +63,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <DiagnosticsConfiguration Include="UIContent\diagnostics.wadcfgx" />
+  </ItemGroup>
+  <ItemGroup>
     <PublishProfile Include="Profiles\artmapswwwProduction.azurePubxml" />
-    <PublishProfile Include="Profiles\artmapswww-production.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
-    <CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\2.0\</CloudExtensionsDir>
+    <CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\2.6\</CloudExtensionsDir>
   </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
 </Project>

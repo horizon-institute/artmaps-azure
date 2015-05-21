@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureCore", "AzureCore\AzureCore.ccproj", "{28C2A102-6DE3-476B-BC06-FD64FB3FF7B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{63414915-0376-404E-8A61-CE9E4E0140F9}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Import", "Import\Import.fsproj", "{73DCF61C-DD2C-4FFD-8DF5-F072E6D12B3E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{A046A20C-A1C4-48BF-B458-841BD3040AAA}"
 EndProject
@@ -31,10 +31,6 @@ Global
 		{63414915-0376-404E-8A61-CE9E4E0140F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63414915-0376-404E-8A61-CE9E4E0140F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63414915-0376-404E-8A61-CE9E4E0140F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73DCF61C-DD2C-4FFD-8DF5-F072E6D12B3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73DCF61C-DD2C-4FFD-8DF5-F072E6D12B3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{73DCF61C-DD2C-4FFD-8DF5-F072E6D12B3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{73DCF61C-DD2C-4FFD-8DF5-F072E6D12B3E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A046A20C-A1C4-48BF-B458-841BD3040AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A046A20C-A1C4-48BF-B458-841BD3040AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A046A20C-A1C4-48BF-B458-841BD3040AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
