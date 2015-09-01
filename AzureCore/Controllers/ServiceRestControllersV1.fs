@@ -63,7 +63,7 @@ type ObjectsOfInterestV1Controller() =
     member this.Get
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 ID : int64) =
-        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.ID = ID))
+        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.ID = ID && o.ContextID = context.ID))
         if o = null then 
             raise (Er.NotFound(Er.NotFoundMinorCode.Unspecified))
         o |> Conv.ObjectToObjectRecord
@@ -78,7 +78,7 @@ type ObjectsOfInterestV1Controller() =
     member this.SearchByURI
             ([<ModelBinder(typeof<WU.ContextBinderProvider>)>]context : CTX.t,
                 [<FromUri>]qp : Types.V1.OoIURIQueryParameters) =
-        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.URI = qp.URI))
+        let o = context.dataContext.ObjectOfInterests.SingleOrDefault((fun (o : ObjectOfInterest) -> o.URI = qp.URI && o.ContextID = context.ID))
         if o = null then 
             raise (Er.NotFound(Er.NotFoundMinorCode.Unspecified))
         o |> Conv.ObjectToObjectRecord
