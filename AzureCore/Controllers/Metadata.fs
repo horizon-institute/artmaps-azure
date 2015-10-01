@@ -59,52 +59,118 @@ module Filters =
         let ARTWORK_URL = sprintf "%s/art/artworks/%s" BASE_URL
         let IMAGE_URL = sprintf "%s%s" BASE_URL
 
-        let ref = uri.Substring(uri.LastIndexOf("/") + 1).Trim()
+        let ref = uri.Replace("tatecollection://", "").Trim()
         let req = WebRequest.Create(ARTWORK_URL ref) :?> HttpWebRequest
         req.UserAgent <- USER_AGENT
         req.KeepAlive <- true
         req.Headers.Set("Pragma", "no-cache")
         req.Timeout <- 300000
         req.Method <- "GET"
-        let res = req.GetResponse()
-        let doc = new HtmlDocument()
-        doc.Load(new StreamReader(res.GetResponseStream()))
-        res.Close()
+        
+        try 
+            let res = req.GetResponse() :?> HttpWebResponse in
+            if res.StatusCode = HttpStatusCode.NotFound then raise (new Exception())
+            else 
+                let doc = new HtmlDocument()
+                doc.Load(new StreamReader(res.GetResponseStream()))
+                res.Close()
 
-        let root = doc.DocumentNode
+                let root = doc.DocumentNode
 
-        let metadata =
-            try
-                let arr = root.SelectNodes("//div[@class='image_box']//img")
-                let rec loop (i : int) =
+                let metadata =
                     try
-                        let imageurl = (IMAGE_URL (arr.[i].Attributes.["src"].Value))
-                        [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
-                    with _ -> 
-                        match i + 1 with
-                        | i when i = arr.Count -> List.empty<t>
-                        | i -> loop i
-                loop 0
-            with _ -> List.empty<t>
+                        let arr = root.SelectNodes("//div[@class='image_box']//img")
+                        let rec loop (i : int) =
+                            try
+                                let imageurl = (IMAGE_URL (arr.[i].Attributes.["src"].Value))
+                                [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
+                            with _ -> 
+                                match i + 1 with
+                                | i when i = arr.Count -> List.empty<t>
+                                | i -> loop i
+                        loop 0
+                    with _ -> List.empty<t>
 
-        let paths = [
-            ("artist", "//div[@id='region-sidebar-artwork']//span[@class='infoWorkArtName']")
-            ("artistdate", "//div[@id='region-sidebar-artwork']//span[@class='infoWorkArtDates']")   
-            ("title", "//div[@id='region-sidebar-artwork']//div[@class='infoTitle infoValue']")   
-            ("artworkdate", "//div[@id='region-sidebar-artwork']//span[@class='infoValue infoDate']/span[1]")   
-            ("reference", "//div[@id='region-sidebar-artwork']//div[@class='infoAcNo infoCollData']/span[1]/span[1]")
-        ] 
-        paths
-            |> List.fold (
-                fun (acc : t list) (name, path) -> 
-                    try
-                        acc @ [{ 
-                                t.ID = -1L;
-                                t.name = name;
-                                t.value = (doc.DocumentNode.SelectNodes(path) |> Seq.head).InnerText;
-                                t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.TextPlain)}]
-                    with _ -> acc
-                ) metadata
+                let paths = [
+                    ("artist", "//div[@id='region-sidebar-artwork']//span[@class='infoWorkArtName']")
+                    ("artistdate", "//div[@id='region-sidebar-artwork']//span[@class='infoWorkArtDates']")   
+                    ("title", "//div[@id='region-sidebar-artwork']//div[@class='infoTitle infoValue']")   
+                    ("artworkdate", "//div[@id='region-sidebar-artwork']//span[@class='infoValue infoDate']/span[1]")   
+                    ("reference", "//div[@id='region-sidebar-artwork']//div[@class='infoAcNo infoCollData']/span[1]/span[1]")
+                ] 
+                paths
+                    |> List.fold (
+                        fun (acc : t list) (name, path) -> 
+                            try
+                                acc @ [{ 
+                                        t.ID = -1L;
+                                        t.name = name;
+                                        t.value = (doc.DocumentNode.SelectNodes(path) |> Seq.head).InnerText;
+                                        t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.TextPlain)}]
+                            with _ -> acc
+                        ) metadata
+
+        with _ -> 
+            let USER_AGENT = @"ArtMapsCore/1.0"
+            let BASE_URL = "http://www.tate.org.uk"
+            let ARTWORK_URL = sprintf "%s/art/archive/%s" BASE_URL
+            let IMAGE_URL = sprintf "%s%s" BASE_URL
+
+            let ref = uri.Replace("tatecollection://", "").Trim()
+            let req = WebRequest.Create(ARTWORK_URL ref) :?> HttpWebRequest
+            req.UserAgent <- USER_AGENT
+            req.KeepAlive <- true
+            req.Headers.Set("Pragma", "no-cache")
+            req.Timeout <- 300000
+            req.Method <- "GET"
+            let res = req.GetResponse() :?> HttpWebResponse
+            let doc = new HtmlDocument()
+            doc.Load(new StreamReader(res.GetResponseStream()))
+            res.Close()
+
+            let root = doc.DocumentNode
+
+            let metadata =
+                try
+                    let arr = root.SelectNodes("//div[@class='image_box']//img")
+                    let rec loop (i : int) =
+                        try
+                            let imageurl = (IMAGE_URL (arr.[i].Attributes.["src"].Value))
+                            [{ t.ID = -1L; name = "imageurl"; t.value = imageurl; t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.LinkImage)}]
+                        with _ -> 
+                            match i + 1 with
+                            | i when i = arr.Count -> List.empty<t>
+                            | i -> loop i
+                    loop 0
+                with _ -> List.empty<t>
+
+            let table = doc.DocumentNode.SelectNodes("//div[@class='tabbed details']/table") |> Seq.head
+            let mappings = table.SelectNodes("//tr") 
+                            |> Seq.fold (fun acc n -> Map.add 
+                                                        (n.Element("th").InnerText.Trim()) 
+                                                        (n.Element("td").InnerText.Trim()) acc) 
+                                                        Map.empty<string, string>
+        
+
+
+            let paths = [ 
+                ("artist", "Created by") 
+                ("title", "Title")   
+                ("artworkdate", "Date")   
+                ("reference", "Reference")
+            ] 
+            paths
+                |> List.fold (
+                    fun (acc : t list) (name, path) -> 
+                        try
+                            acc @ [{ 
+                                    t.ID = -1L;
+                                    t.name = name;
+                                    t.value = mappings.Item(path);
+                                    t.valueType = Enum.GetName(typeof<MetadataValueType>, MetadataValueType.TextPlain)}]
+                        with _ -> acc
+                    ) metadata 
+        
 
 
 open System.Reflection
